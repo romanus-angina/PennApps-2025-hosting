@@ -9,3 +9,11 @@ dist/
 
 # VSCode
 .vscode/
+
+# Backend generated data / caches
+backend/data/
+
+# osmnx / requests-cache
+.cache/osmnx/
+.osmnx_cache/
+requests-cache.sqlite
