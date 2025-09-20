@@ -81,6 +81,7 @@ export default function ShadeClassifier({
   const [ready, setReady] = useState(false);
   const lastDateRef = useRef<Date>(date);
   const fetchTokenRef = useRef(0);
+  const [currentTime, setCurrentTime] = useState(540); // 9 AM in minutes
 
   // Use refs instead of state to avoid re-renders
   const pathStateRef = useRef<PathState>({
@@ -573,30 +574,106 @@ export default function ShadeClassifier({
         font: "14px system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
       }}>
         {ready ? "Shadows ready" : "Rendering shadows…"}
-        <div style={{ marginTop: 6, display: "flex", gap: 8, alignItems: "center" }}>
-          <input
-            type="range" min={0} max={1440} step={5} defaultValue={540}
-            onChange={async (e) => {
-              const mins = parseInt((e.target as HTMLInputElement).value, 10);
-              const d = new Date();
-              d.setHours(0, 0, 0, 0);
-              d.setMinutes(mins);
 
-              lastDateRef.current = d;
-              if (shadeRef.current?.setDate) {
-                setReady(false);
-                shadeRef.current.setDate(d);
-                await new Promise<void>((res) => shadeRef.current.once("idle", () => {
-                  setReady(true);
-                  res();
-                }));
-                await classifyAndDraw();
-              }
-            }}
-          />
-          <button onClick={classifyAndDraw} disabled={!ready}>
-            {ready ? "Classify edges" : "Wait..."}
-          </button>
+        {/* Time slider with hour markings */}
+        <div style={{ marginTop: 8, width: '400px' }}>
+          <div style={{ position: 'relative', height: '40px' }}>
+            {/* Hour markers */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              position: 'absolute',
+              width: '100%',
+              top: '20px',
+              fontSize: '10px',
+              color: '#ccc'
+            }}>
+              {Array.from({ length: 13 }, (_, i) => {
+                const hour = i * 2; // 00, 02, 04, 06, 08, 10, 12, 14, 16, 18, 20, 22, 24
+                return (
+                  <div key={hour} style={{ textAlign: 'center', width: '20px' }}>
+                    {hour.toString().padStart(2, '0')}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Slider */}
+            <input
+              type="range"
+              min={0} // 12 AM (0 minutes)
+              max={1440} // 12 AM next day (24 * 60) 
+              step={5}
+              value={currentTime}
+              style={{
+                width: '100%',
+                position: 'absolute',
+                top: '0px',
+                WebkitAppearance: 'none',
+                height: '4px',
+                background: 'linear-gradient(to right, #1a1a1a 0%, #1a1a1a 25%, #ffd700 50%, #ff6b35 75%, #1a1a1a 100%)',
+                borderRadius: '2px',
+                outline: 'none'
+              } as React.CSSProperties}
+              onChange={async (e) => {
+                const mins = parseInt((e.target as HTMLInputElement).value, 10);
+                setCurrentTime(mins);
+
+                const d = new Date();
+                d.setHours(0, 0, 0, 0);
+                d.setMinutes(mins);
+
+                lastDateRef.current = d;
+                if (shadeRef.current?.setDate) {
+                  setReady(false);
+                  shadeRef.current.setDate(d);
+                  await new Promise<void>((res) => shadeRef.current.once("idle", () => {
+                    setReady(true);
+                    res();
+                  }));
+                  await classifyAndDraw();
+                }
+              }}
+            />
+          </div>
+
+          {/* Time display and controls */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginTop: '8px',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{
+              background: 'rgba(255,255,255,0.1)',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              fontSize: '12px'
+            }}>
+              {(() => {
+                const hours = Math.floor(currentTime / 60);
+                const mins = currentTime % 60;
+                return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+              })()}
+            </div>
+
+            <button
+              onClick={classifyAndDraw}
+              disabled={!ready}
+              style={{
+                padding: '4px 12px',
+                fontSize: '12px',
+                backgroundColor: ready ? '#007cba' : '#666',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: ready ? 'pointer' : 'not-allowed'
+              }}
+            >
+              {ready ? "Classify edges" : "Wait..."}
+            </button>
+          </div>
         </div>
       </div>
 
