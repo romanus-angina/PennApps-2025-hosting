@@ -1,0 +1,3329 @@
+{
+  "water_fountains": [
+    {
+      "id": "water_('node', 1586414753)",
+      "type": "water",
+      "name": "drinking_water",
+      "coordinates": [
+        39.9662606,
+        -75.1826961
+      ],
+      "longitude": -75.1826961,
+      "latitude": 39.9662606,
+      "amenity": "drinking_water",
+      "shop": "",
+      "opening_hours": "",
+      "website": "",
+      "phone": ""
+    },
+    {
+      "id": "water_('node', 2443572317)",
+      "type": "water",
+      "name": "drinking_water",
+      "coordinates": [
+        39.9492701,
+        -75.1494459
+      ],
+      "longitude": -75.1494459,
+      "latitude": 39.9492701,
+      "amenity": "drinking_water",
+      "shop": "",
+      "opening_hours": "",
+      "website": "",
+      "phone": ""
+    },
+    {
+      "id": "water_('node', 3258644199)",
+      "type": "water",
+      "name": "drinking_water",
+      "coordinates": [
+        39.9506478,
+        -75.1813196
+      ],
+      "longitude": -75.1813196,
+      "latitude": 39.9506478,
+      "amenity": "drinking_water",
+      "shop": "",
+      "opening_hours": "",
+      "website": "",
+      "phone": ""
+    },
+    {
+      "id": "water_('node', 5035264605)",
+      "type": "water",
+      "name": "drinking_water",
+      "coordinates": [
+        39.9672395,
+        -75.1834077
+      ],
+      "longitude": -75.1834077,
+      "latitude": 39.9672395,
+      "amenity": "drinking_water",
+      "shop": "",
+      "opening_hours": "",
+      "website": "",
+      "phone": ""
+    },
+    {
+      "id": "water_('node', 6363095893)",
+      "type": "water",
+      "name": "drinking_water",
+      "coordinates": [
+        39.9926824,
+        -75.1942129
+      ],
+      "longitude": -75.1942129,
+      "latitude": 39.9926824,
+      "amenity": "drinking_water",
+      "shop": "",
+      "opening_hours": "",
+      "website": "",
+      "phone": ""
+    },
+    {
+      "id": "water_('node', 6593942434)",
+      "type": "water",
+      "name": "drinking_water",
+      "coordinates": [
+        39.9475616,
+        -75.1794414
+      ],
+      "longitude": -75.1794414,
+      "latitude": 39.9475616,
+      "amenity": "drinking_water",
+      "shop": "",
+      "opening_hours": "",
+      "website": "",
+      "phone": ""
+    },
+    {
+      "id": "water_('node', 6681553190)",
+      "type": "water",
+      "name": "drinking_water",
+      "coordinates": [
+        39.9522786,
+        -75.1649785
+      ],
+      "longitude": -75.1649785,
+      "latitude": 39.9522786,
+      "amenity": "drinking_water",
+      "shop": "",
+      "opening_hours": "",
+      "website": "",
+      "phone": ""
+    },
+    {
+      "id": "water_('node', 6697859810)",
+      "type": "water",
+      "name": "drinking_water",
+      "coordinates": [
+        39.9689747,
+        -75.1850819
+      ],
+      "longitude": -75.1850819,
+      "latitude": 39.9689747,
+      "amenity": "drinking_water",
+      "shop": "",
+      "opening_hours": "",
+      "website": "",
+      "phone": ""
+    },
+    {
+      "id": "water_('node', 9038480946)",
+      "type": "water",
+      "name": "drinking_water",
+      "coordinates": [
+        39.948044,
+        -75.183179
+      ],
+      "longitude": -75.183179,
+      "latitude": 39.948044,
+      "amenity": "drinking_water",
+      "shop": "",
+      "opening_hours": "",
+      "website": "",
+      "phone": ""
+    }
+  ],
+  "stores": [
+    {
+      "id": "store_('node', 333786275)",
+      "type": "store",
+      "name": "Whole Foods Market",
+      "coordinates": [
+        39.9428324,
+        -75.1581249
+      ],
+      "longitude": -75.1581249,
+      "latitude": 39.9428324,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 07:00-22:00",
+      "website": "https://www.wholefoodsmarket.com/stores/southstreet",
+      "phone": "+1 215-733-9788"
+    },
+    {
+      "id": "store_('node', 361009251)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.955196,
+        -75.1683345
+      ],
+      "longitude": -75.1683345,
+      "latitude": 39.955196,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "05:00-23:00",
+      "website": "https://www.wawa.com/locations/0086",
+      "phone": "+1 215-977-9558"
+    },
+    {
+      "id": "store_('node', 666303125)",
+      "type": "store",
+      "name": "Northside Market",
+      "coordinates": [
+        39.9588966,
+        -75.1903089
+      ],
+      "longitude": -75.1903089,
+      "latitude": 39.9588966,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "Mo-Fr 10:00-01:00;Sa,Su 08:00-01:00",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 977690451)",
+      "type": "store",
+      "name": "Acme",
+      "coordinates": [
+        39.9688976,
+        -75.1391226
+      ],
+      "longitude": -75.1391226,
+      "latitude": 39.9688976,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "07:00-23:00",
+      "website": "https://local.acmemarkets.com/pa/philadelphia/180-w-girard-ave.html",
+      "phone": "+1 215-574-2922"
+    },
+    {
+      "id": "store_('node', 1032321422)",
+      "type": "store",
+      "name": "Pac a Deli",
+      "coordinates": [
+        39.948676,
+        -75.160688
+      ],
+      "longitude": -75.160688,
+      "latitude": 39.948676,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "07:00 - 24:00",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1204727699)",
+      "type": "store",
+      "name": "South Philadelphia Store",
+      "coordinates": [
+        39.9327374,
+        -75.1617092
+      ],
+      "longitude": -75.1617092,
+      "latitude": 39.9327374,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1606862517)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.94177,
+        -75.145776
+      ],
+      "longitude": -75.145776,
+      "latitude": 39.94177,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1665436766)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9557291,
+        -75.1921187
+      ],
+      "longitude": -75.1921187,
+      "latitude": 39.9557291,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "24/7",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/3440-market-st-35020",
+      "phone": "+1 215-222-1317"
+    },
+    {
+      "id": "store_('node', 1698263284)",
+      "type": "store",
+      "name": "nan",
+      "coordinates": [
+        39.9854915,
+        -75.1494582
+      ],
+      "longitude": -75.1494582,
+      "latitude": 39.9854915,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1702834399)",
+      "type": "store",
+      "name": "AsianFresh",
+      "coordinates": [
+        39.9548883,
+        -75.1561251
+      ],
+      "longitude": -75.1561251,
+      "latitude": 39.9548883,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1746173984)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.9772083,
+        -75.118472
+      ],
+      "longitude": -75.118472,
+      "latitude": 39.9772083,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1749978205)",
+      "type": "store",
+      "name": "Castro Grocery",
+      "coordinates": [
+        39.9320636,
+        -75.1715141
+      ],
+      "longitude": -75.1715141,
+      "latitude": 39.9320636,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1769678434)",
+      "type": "store",
+      "name": "La Guadalupana",
+      "coordinates": [
+        39.9933436,
+        -75.139909
+      ],
+      "longitude": -75.139909,
+      "latitude": 39.9933436,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1769678446)",
+      "type": "store",
+      "name": "Tavares Grocery",
+      "coordinates": [
+        39.9936372,
+        -75.1388076
+      ],
+      "longitude": -75.1388076,
+      "latitude": 39.9936372,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1769678448)",
+      "type": "store",
+      "name": "LLG Grocery",
+      "coordinates": [
+        39.9948327,
+        -75.1375733
+      ],
+      "longitude": -75.1375733,
+      "latitude": 39.9948327,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1769678452)",
+      "type": "store",
+      "name": "Maria's Grocery",
+      "coordinates": [
+        39.9951026,
+        -75.139512
+      ],
+      "longitude": -75.139512,
+      "latitude": 39.9951026,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1769678455)",
+      "type": "store",
+      "name": "Chuchu Mini Market",
+      "coordinates": [
+        39.9935164,
+        -75.1378476
+      ],
+      "longitude": -75.1378476,
+      "latitude": 39.9935164,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1769678458)",
+      "type": "store",
+      "name": "Fine Fare",
+      "coordinates": [
+        39.9914167,
+        -75.132135
+      ],
+      "longitude": -75.132135,
+      "latitude": 39.9914167,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1769695282)",
+      "type": "store",
+      "name": "James Produce",
+      "coordinates": [
+        39.9910339,
+        -75.1340832
+      ],
+      "longitude": -75.1340832,
+      "latitude": 39.9910339,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 1847081949)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9671264,
+        -75.175859
+      ],
+      "longitude": -75.175859,
+      "latitude": 39.9671264,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 2002961958)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9820385,
+        -75.1560567
+      ],
+      "longitude": -75.1560567,
+      "latitude": 39.9820385,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "24/7",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/1912-liacouras-walk-33285",
+      "phone": "+1 215-204-7799"
+    },
+    {
+      "id": "store_('node', 2012656015)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9790106,
+        -75.1596076
+      ],
+      "longitude": -75.1596076,
+      "latitude": 39.9790106,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/1501-cecil-b-moore-ave-33515",
+      "phone": "+1 215-763-0439"
+    },
+    {
+      "id": "store_('node', 2014324526)",
+      "type": "store",
+      "name": "Cousin's",
+      "coordinates": [
+        39.9808738,
+        -75.1440723
+      ],
+      "longitude": -75.1440723,
+      "latitude": 39.9808738,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 2123741534)",
+      "type": "store",
+      "name": "Trader Joe's",
+      "coordinates": [
+        39.9541843,
+        -75.1764296
+      ],
+      "longitude": -75.1764296,
+      "latitude": 39.9541843,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 08:00-21:00",
+      "website": "https://locations.traderjoes.com/pa/philadelphia/634/",
+      "phone": "+1 215-569-9282"
+    },
+    {
+      "id": "store_('node', 2179184398)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9538699,
+        -75.1768471
+      ],
+      "longitude": -75.1768471,
+      "latitude": 39.9538699,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 2222493623)",
+      "type": "store",
+      "name": "QQ Deli Market",
+      "coordinates": [
+        39.9560453,
+        -75.1604697
+      ],
+      "longitude": -75.1604697,
+      "latitude": 39.9560453,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "+1-267-243-5077"
+    },
+    {
+      "id": "store_('node', 2247020282)",
+      "type": "store",
+      "name": "4 Seasons Food Market",
+      "coordinates": [
+        39.949889,
+        -75.1760318
+      ],
+      "longitude": -75.1760318,
+      "latitude": 39.949889,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 2253188240)",
+      "type": "store",
+      "name": "Sabir Restaurant",
+      "coordinates": [
+        39.9523299,
+        -75.1870879
+      ],
+      "longitude": -75.1870879,
+      "latitude": 39.9523299,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 2267258446)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9531732,
+        -75.1607241
+      ],
+      "longitude": -75.1607241,
+      "latitude": 39.9531732,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "24/7",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/1215-filbert-street-33516",
+      "phone": "+1 215-923-2044"
+    },
+    {
+      "id": "store_('node', 2390519811)",
+      "type": "store",
+      "name": "Palm Tree",
+      "coordinates": [
+        39.9359277,
+        -75.1467715
+      ],
+      "longitude": -75.1467715,
+      "latitude": 39.9359277,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 2573863054)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.9622995,
+        -75.172995
+      ],
+      "longitude": -75.172995,
+      "latitude": 39.9622995,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "06:00-23:00",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 2573928768)",
+      "type": "store",
+      "name": "Klein's Supermarket",
+      "coordinates": [
+        39.9672097,
+        -75.1774371
+      ],
+      "longitude": -75.1774371,
+      "latitude": 39.9672097,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Fr 08:00-20:00; Sa 08:00-18:00; Su 09:00-13:00",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 2581158950)",
+      "type": "store",
+      "name": "Rittenhouse Market",
+      "coordinates": [
+        39.947866,
+        -75.1710476
+      ],
+      "longitude": -75.1710476,
+      "latitude": 39.947866,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "https://rittenhousemarkets.com/",
+      "phone": "+1 215-985-5930"
+    },
+    {
+      "id": "store_('node', 2581931955)",
+      "type": "store",
+      "name": "Museum Market",
+      "coordinates": [
+        39.9631547,
+        -75.1685173
+      ],
+      "longitude": -75.1685173,
+      "latitude": 39.9631547,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 2700397851)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.955591,
+        -75.1912693
+      ],
+      "longitude": -75.1912693,
+      "latitude": 39.955591,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "24/7",
+      "website": "nan",
+      "phone": "+1-215-375-7996"
+    },
+    {
+      "id": "store_('node', 2700422417)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.9545647,
+        -75.1949278
+      ],
+      "longitude": -75.1949278,
+      "latitude": 39.9545647,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 2711042095)",
+      "type": "store",
+      "name": "New Market",
+      "coordinates": [
+        39.9286037,
+        -75.1738395
+      ],
+      "longitude": -75.1738395,
+      "latitude": 39.9286037,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3076977533)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.9482935,
+        -75.1567637
+      ],
+      "longitude": -75.1567637,
+      "latitude": 39.9482935,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "24/7",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3103189631)",
+      "type": "store",
+      "name": "Lake Blue Gourmet Market",
+      "coordinates": [
+        39.9505218,
+        -75.1457148
+      ],
+      "longitude": -75.1457148,
+      "latitude": 39.9505218,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3103189791)",
+      "type": "store",
+      "name": "Harry's Smoke Shop",
+      "coordinates": [
+        39.9506534,
+        -75.1456947
+      ],
+      "longitude": -75.1456947,
+      "latitude": 39.9506534,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3271920514)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.9511076,
+        -75.1990178
+      ],
+      "longitude": -75.1990178,
+      "latitude": 39.9511076,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3394720637)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9601636,
+        -75.1676968
+      ],
+      "longitude": -75.1676968,
+      "latitude": 39.9601636,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/1-franklin-town-blvd-36108",
+      "phone": "+1 215-864-0583"
+    },
+    {
+      "id": "store_('node', 3437582097)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9561827,
+        -75.1630275
+      ],
+      "longitude": -75.1630275,
+      "latitude": 39.9561827,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "24/7",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/150-n-broad-st-34908",
+      "phone": "+1 215-575-0827"
+    },
+    {
+      "id": "store_('node', 3517411347)",
+      "type": "store",
+      "name": "Hung Vuong Supermarket",
+      "coordinates": [
+        39.9364072,
+        -75.1626696
+      ],
+      "longitude": -75.1626696,
+      "latitude": 39.9364072,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3548911783)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9505325,
+        -75.1603164
+      ],
+      "longitude": -75.1603164,
+      "latitude": 39.9505325,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/1201-chestnut-street-33305",
+      "phone": "+1 215-564-6003"
+    },
+    {
+      "id": "store_('node', 3587740655)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9499635,
+        -75.1454025
+      ],
+      "longitude": -75.1454025,
+      "latitude": 39.9499635,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/242-244-market-st-36875",
+      "phone": "+1 215-574-3560"
+    },
+    {
+      "id": "store_('node', 3669159283)",
+      "type": "store",
+      "name": "6th Street Mini Market",
+      "coordinates": [
+        39.9462198,
+        -75.1190214
+      ],
+      "longitude": -75.1190214,
+      "latitude": 39.9462198,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3669226982)",
+      "type": "store",
+      "name": "B&B Grocery",
+      "coordinates": [
+        39.9514622,
+        -75.1157571
+      ],
+      "longitude": -75.1157571,
+      "latitude": 39.9514622,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3669343703)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9470485,
+        -75.1225295
+      ],
+      "longitude": -75.1225295,
+      "latitude": 39.9470485,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "https://www.7-eleven.com/locations/nj/camden/330-cooper-st-35693",
+      "phone": "+1 856-541-1321"
+    },
+    {
+      "id": "store_('node', 3670701017)",
+      "type": "store",
+      "name": "Duran Grocery",
+      "coordinates": [
+        39.9322476,
+        -75.1192925
+      ],
+      "longitude": -75.1192925,
+      "latitude": 39.9322476,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3670704817)",
+      "type": "store",
+      "name": "F.R. Grocery",
+      "coordinates": [
+        39.933151,
+        -75.1192944
+      ],
+      "longitude": -75.1192944,
+      "latitude": 39.933151,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3670797116)",
+      "type": "store",
+      "name": "Square Mini Market",
+      "coordinates": [
+        39.9056634,
+        -75.1058023
+      ],
+      "longitude": -75.1058023,
+      "latitude": 39.9056634,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3670797118)",
+      "type": "store",
+      "name": "Fernando Supermarket",
+      "coordinates": [
+        39.9058278,
+        -75.1053139
+      ],
+      "longitude": -75.1053139,
+      "latitude": 39.9058278,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3679823662)",
+      "type": "store",
+      "name": "Golden Gate Grocery",
+      "coordinates": [
+        39.9277142,
+        -75.1066419
+      ],
+      "longitude": -75.1066419,
+      "latitude": 39.9277142,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3679832071)",
+      "type": "store",
+      "name": "Henriquez Grocery Store",
+      "coordinates": [
+        39.9269902,
+        -75.1066232
+      ],
+      "longitude": -75.1066232,
+      "latitude": 39.9269902,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3679967543)",
+      "type": "store",
+      "name": "Mt. Ephraim Grocery",
+      "coordinates": [
+        39.9296465,
+        -75.1079335
+      ],
+      "longitude": -75.1079335,
+      "latitude": 39.9296465,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3679975394)",
+      "type": "store",
+      "name": "Mike's Cold Cuts & Grocery",
+      "coordinates": [
+        39.9310451,
+        -75.1082568
+      ],
+      "longitude": -75.1082568,
+      "latitude": 39.9310451,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3680620758)",
+      "type": "store",
+      "name": "H&H Grocery",
+      "coordinates": [
+        39.9342568,
+        -75.1135261
+      ],
+      "longitude": -75.1135261,
+      "latitude": 39.9342568,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3680657839)",
+      "type": "store",
+      "name": "India Food Market",
+      "coordinates": [
+        39.9370717,
+        -75.1102922
+      ],
+      "longitude": -75.1102922,
+      "latitude": 39.9370717,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3680726807)",
+      "type": "store",
+      "name": "Halal Foods Plus",
+      "coordinates": [
+        39.9326057,
+        -75.1037208
+      ],
+      "longitude": -75.1037208,
+      "latitude": 39.9326057,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3680732758)",
+      "type": "store",
+      "name": "nan",
+      "coordinates": [
+        39.9330736,
+        -75.1040064
+      ],
+      "longitude": -75.1040064,
+      "latitude": 39.9330736,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3680755569)",
+      "type": "store",
+      "name": "Fortuna Mini Mart",
+      "coordinates": [
+        39.9317992,
+        -75.1047195
+      ],
+      "longitude": -75.1047195,
+      "latitude": 39.9317992,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3680768408)",
+      "type": "store",
+      "name": "Eddy's Grocery",
+      "coordinates": [
+        39.9322427,
+        -75.1025956
+      ],
+      "longitude": -75.1025956,
+      "latitude": 39.9322427,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3688112126)",
+      "type": "store",
+      "name": "T&C Food Market",
+      "coordinates": [
+        39.9387102,
+        -75.1234868
+      ],
+      "longitude": -75.1234868,
+      "latitude": 39.9387102,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3690460687)",
+      "type": "store",
+      "name": "Jimenez Grocery",
+      "coordinates": [
+        39.9300411,
+        -75.122037
+      ],
+      "longitude": -75.122037,
+      "latitude": 39.9300411,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3690478794)",
+      "type": "store",
+      "name": "Frank's Convenience Store",
+      "coordinates": [
+        39.9206996,
+        -75.1215878
+      ],
+      "longitude": -75.1215878,
+      "latitude": 39.9206996,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3690569563)",
+      "type": "store",
+      "name": "Family Food Center & Deli",
+      "coordinates": [
+        39.9122713,
+        -75.112993
+      ],
+      "longitude": -75.112993,
+      "latitude": 39.9122713,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3690755762)",
+      "type": "store",
+      "name": "nan",
+      "coordinates": [
+        39.917846,
+        -75.1015266
+      ],
+      "longitude": -75.1015266,
+      "latitude": 39.917846,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3690774406)",
+      "type": "store",
+      "name": "Leyba Grocery Store",
+      "coordinates": [
+        39.9205292,
+        -75.1131858
+      ],
+      "longitude": -75.1131858,
+      "latitude": 39.9205292,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3691554575)",
+      "type": "store",
+      "name": "Martinez Grocery Store",
+      "coordinates": [
+        39.914187,
+        -75.1124419
+      ],
+      "longitude": -75.1124419,
+      "latitude": 39.914187,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3691592365)",
+      "type": "store",
+      "name": "Jonathan Groceries",
+      "coordinates": [
+        39.9044915,
+        -75.1026385
+      ],
+      "longitude": -75.1026385,
+      "latitude": 39.9044915,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3691747110)",
+      "type": "store",
+      "name": "Amarilli's Grocery",
+      "coordinates": [
+        39.928991,
+        -75.1044056
+      ],
+      "longitude": -75.1044056,
+      "latitude": 39.928991,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3691756412)",
+      "type": "store",
+      "name": "Elizabeth Grocery",
+      "coordinates": [
+        39.9278339,
+        -75.1018788
+      ],
+      "longitude": -75.1018788,
+      "latitude": 39.9278339,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3691922805)",
+      "type": "store",
+      "name": "F&S Food Market",
+      "coordinates": [
+        39.9530198,
+        -75.1189671
+      ],
+      "longitude": -75.1189671,
+      "latitude": 39.9530198,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3692035201)",
+      "type": "store",
+      "name": "Nueva Era Grocery",
+      "coordinates": [
+        39.9511269,
+        -75.1195458
+      ],
+      "longitude": -75.1195458,
+      "latitude": 39.9511269,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3692043148)",
+      "type": "store",
+      "name": "Agramonte Grocery",
+      "coordinates": [
+        39.9521529,
+        -75.1249247
+      ],
+      "longitude": -75.1249247,
+      "latitude": 39.9521529,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3692063870)",
+      "type": "store",
+      "name": "Perez Grocery",
+      "coordinates": [
+        39.952119,
+        -75.1203006
+      ],
+      "longitude": -75.1203006,
+      "latitude": 39.952119,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3692111551)",
+      "type": "store",
+      "name": "Los Compadres Grocery Store",
+      "coordinates": [
+        39.9515998,
+        -75.1176049
+      ],
+      "longitude": -75.1176049,
+      "latitude": 39.9515998,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3692127121)",
+      "type": "store",
+      "name": "William Grocery",
+      "coordinates": [
+        39.9506879,
+        -75.1127959
+      ],
+      "longitude": -75.1127959,
+      "latitude": 39.9506879,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3692144300)",
+      "type": "store",
+      "name": "4th & York Mini Market",
+      "coordinates": [
+        39.9540284,
+        -75.1199566
+      ],
+      "longitude": -75.1199566,
+      "latitude": 39.9540284,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3692144301)",
+      "type": "store",
+      "name": "Bernard Grocery Store",
+      "coordinates": [
+        39.9541765,
+        -75.1195918
+      ],
+      "longitude": -75.1195918,
+      "latitude": 39.9541765,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 3773472970)",
+      "type": "store",
+      "name": "Colombia deli",
+      "coordinates": [
+        39.9792182,
+        -75.162619
+      ],
+      "longitude": -75.162619,
+      "latitude": 39.9792182,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 4064001986)",
+      "type": "store",
+      "name": "F. Jaquez Deli and Grocery",
+      "coordinates": [
+        39.9643207,
+        -75.1475707
+      ],
+      "longitude": -75.1475707,
+      "latitude": 39.9643207,
+      "amenity": "nan",
+      "shop": "grocery",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "+1-215-928-0606"
+    },
+    {
+      "id": "store_('node', 4073414052)",
+      "type": "store",
+      "name": "Monde Market",
+      "coordinates": [
+        39.9519703,
+        -75.1756187
+      ],
+      "longitude": -75.1756187,
+      "latitude": 39.9519703,
+      "amenity": "nan",
+      "shop": "beverages",
+      "opening_hours": "Mo-Su 07:00-23:59",
+      "website": "http://mondemarket.blogspot.com",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 4379394800)",
+      "type": "store",
+      "name": "88 Grocery",
+      "coordinates": [
+        39.9316566,
+        -75.1683598
+      ],
+      "longitude": -75.1683598,
+      "latitude": 39.9316566,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 4504641360)",
+      "type": "store",
+      "name": "Best of Both Worlds",
+      "coordinates": [
+        39.9167638,
+        -75.16099
+      ],
+      "longitude": -75.16099,
+      "latitude": 39.9167638,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 4534023857)",
+      "type": "store",
+      "name": "Michelle's Market",
+      "coordinates": [
+        39.9313282,
+        -75.1658558
+      ],
+      "longitude": -75.1658558,
+      "latitude": 39.9313282,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 4589238519)",
+      "type": "store",
+      "name": "Friendly Grocery",
+      "coordinates": [
+        39.9296359,
+        -75.1707937
+      ],
+      "longitude": -75.1707937,
+      "latitude": 39.9296359,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 4806393201)",
+      "type": "store",
+      "name": "Mini Market",
+      "coordinates": [
+        39.9807992,
+        -75.1614196
+      ],
+      "longitude": -75.1614196,
+      "latitude": 39.9807992,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 4806462799)",
+      "type": "store",
+      "name": "Lee's Foodway",
+      "coordinates": [
+        39.9787523,
+        -75.1590604
+      ],
+      "longitude": -75.1590604,
+      "latitude": 39.9787523,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 4806650197)",
+      "type": "store",
+      "name": "The Hut",
+      "coordinates": [
+        39.9812757,
+        -75.1549838
+      ],
+      "longitude": -75.1549838,
+      "latitude": 39.9812757,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 4949396621)",
+      "type": "store",
+      "name": "Benjamin Franklin Beer",
+      "coordinates": [
+        39.9491499,
+        -75.1437893
+      ],
+      "longitude": -75.1437893,
+      "latitude": 39.9491499,
+      "amenity": "nan",
+      "shop": "beverages",
+      "opening_hours": "Mo-Sa 10:00-22:00; Su 10:00-21:00",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5003866321)",
+      "type": "store",
+      "name": "Foodery",
+      "coordinates": [
+        39.9448079,
+        -75.1582838
+      ],
+      "longitude": -75.1582838,
+      "latitude": 39.9448079,
+      "amenity": "nan",
+      "shop": "beverages",
+      "opening_hours": "Mo-Su 09:00-24:00",
+      "website": "nan",
+      "phone": "+1 215-928-1111"
+    },
+    {
+      "id": "store_('node', 5229243705)",
+      "type": "store",
+      "name": "Whole Foods Market",
+      "coordinates": [
+        39.9630215,
+        -75.1742544
+      ],
+      "longitude": -75.1742544,
+      "latitude": 39.9630215,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 07:00-22:00",
+      "website": "https://www.wholefoodsmarket.com/stores/phillycentercity",
+      "phone": "+1 215-557-0015"
+    },
+    {
+      "id": "store_('node', 5257990168)",
+      "type": "store",
+      "name": "DGX",
+      "coordinates": [
+        39.9664909,
+        -75.1400276
+      ],
+      "longitude": -75.1400276,
+      "latitude": 39.9664909,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "Mo-Sa 07:00-23:00; Su 09:00-23:00",
+      "website": "dgxstore.com",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5534298927)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9986702,
+        -75.1088401
+      ],
+      "longitude": -75.1088401,
+      "latitude": 39.9986702,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/3359-kensington-ave-21048",
+      "phone": "+1 215-425-7693"
+    },
+    {
+      "id": "store_('node', 5633016069)",
+      "type": "store",
+      "name": "Old Nelson",
+      "coordinates": [
+        39.9575184,
+        -75.1919299
+      ],
+      "longitude": -75.1919299,
+      "latitude": 39.9575184,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "Mo-Sa 08:00-22:00; Su 09:00-21:00",
+      "website": "https://www.oldnelsonfood.com",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5648653105)",
+      "type": "store",
+      "name": "Young's Market",
+      "coordinates": [
+        39.9236685,
+        -75.1122277
+      ],
+      "longitude": -75.1122277,
+      "latitude": 39.9236685,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5648653106)",
+      "type": "store",
+      "name": "Gomez Mini Market",
+      "coordinates": [
+        39.9230198,
+        -75.1086839
+      ],
+      "longitude": -75.1086839,
+      "latitude": 39.9230198,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5648653113)",
+      "type": "store",
+      "name": "The New Village Supermarket",
+      "coordinates": [
+        39.9232903,
+        -75.1082676
+      ],
+      "longitude": -75.1082676,
+      "latitude": 39.9232903,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5650032218)",
+      "type": "store",
+      "name": "Greatown Deli & Grocery",
+      "coordinates": [
+        39.9263046,
+        -75.1041008
+      ],
+      "longitude": -75.1041008,
+      "latitude": 39.9263046,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5650032219)",
+      "type": "store",
+      "name": "Jesenia Grocery",
+      "coordinates": [
+        39.9243046,
+        -75.1029799
+      ],
+      "longitude": -75.1029799,
+      "latitude": 39.9243046,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5650228418)",
+      "type": "store",
+      "name": "Arias Mini Mart",
+      "coordinates": [
+        39.9331594,
+        -75.1032427
+      ],
+      "longitude": -75.1032427,
+      "latitude": 39.9331594,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5650297530)",
+      "type": "store",
+      "name": "R D Grocery",
+      "coordinates": [
+        39.9365878,
+        -75.1056734
+      ],
+      "longitude": -75.1056734,
+      "latitude": 39.9365878,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5650437595)",
+      "type": "store",
+      "name": "Jennifer Grocery",
+      "coordinates": [
+        39.9302858,
+        -75.1060422
+      ],
+      "longitude": -75.1060422,
+      "latitude": 39.9302858,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5650476726)",
+      "type": "store",
+      "name": "Martinez Grocery",
+      "coordinates": [
+        39.9267261,
+        -75.1073242
+      ],
+      "longitude": -75.1073242,
+      "latitude": 39.9267261,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5650476727)",
+      "type": "store",
+      "name": "Los Rios Mini Market",
+      "coordinates": [
+        39.9263705,
+        -75.1093184
+      ],
+      "longitude": -75.1093184,
+      "latitude": 39.9263705,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5652742954)",
+      "type": "store",
+      "name": "Aguilera Grocery Store",
+      "coordinates": [
+        39.9312024,
+        -75.123733
+      ],
+      "longitude": -75.123733,
+      "latitude": 39.9312024,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5652742984)",
+      "type": "store",
+      "name": "Martinez Grocery II",
+      "coordinates": [
+        39.9323353,
+        -75.1177925
+      ],
+      "longitude": -75.1177925,
+      "latitude": 39.9323353,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5655030851)",
+      "type": "store",
+      "name": "Norma's Grocery Outlet",
+      "coordinates": [
+        39.9349738,
+        -75.122645
+      ],
+      "longitude": -75.122645,
+      "latitude": 39.9349738,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5655092852)",
+      "type": "store",
+      "name": "Zapata Grocery",
+      "coordinates": [
+        39.9369475,
+        -75.113919
+      ],
+      "longitude": -75.113919,
+      "latitude": 39.9369475,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5657612795)",
+      "type": "store",
+      "name": "Rosemary Mini Market",
+      "coordinates": [
+        39.9379135,
+        -75.1174453
+      ],
+      "longitude": -75.1174453,
+      "latitude": 39.9379135,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5657612796)",
+      "type": "store",
+      "name": "Center Food Market",
+      "coordinates": [
+        39.9377883,
+        -75.1215196
+      ],
+      "longitude": -75.1215196,
+      "latitude": 39.9377883,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5659018913)",
+      "type": "store",
+      "name": "Singh Convenience Store",
+      "coordinates": [
+        39.9457555,
+        -75.1184888
+      ],
+      "longitude": -75.1184888,
+      "latitude": 39.9457555,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5659018914)",
+      "type": "store",
+      "name": "Check Cashing Services",
+      "coordinates": [
+        39.9457155,
+        -75.1185008
+      ],
+      "longitude": -75.1185008,
+      "latitude": 39.9457155,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5659764224)",
+      "type": "store",
+      "name": "Northgate Deli & Grocery",
+      "coordinates": [
+        39.9491503,
+        -75.1168426
+      ],
+      "longitude": -75.1168426,
+      "latitude": 39.9491503,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5714355236)",
+      "type": "store",
+      "name": "Almonte Deli Grocery",
+      "coordinates": [
+        39.994517,
+        -75.1456241
+      ],
+      "longitude": -75.1456241,
+      "latitude": 39.994517,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5714355238)",
+      "type": "store",
+      "name": "Family Food Market",
+      "coordinates": [
+        39.9988552,
+        -75.1449109
+      ],
+      "longitude": -75.1449109,
+      "latitude": 39.9988552,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5714355250)",
+      "type": "store",
+      "name": "Balbi Food Market",
+      "coordinates": [
+        39.9957095,
+        -75.1443509
+      ],
+      "longitude": -75.1443509,
+      "latitude": 39.9957095,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5714395562)",
+      "type": "store",
+      "name": "Afan Food Plus",
+      "coordinates": [
+        39.9956369,
+        -75.1437044
+      ],
+      "longitude": -75.1437044,
+      "latitude": 39.9956369,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5714395564)",
+      "type": "store",
+      "name": "Maria & D.N. Grocery Store",
+      "coordinates": [
+        39.9957088,
+        -75.1430298
+      ],
+      "longitude": -75.1430298,
+      "latitude": 39.9957088,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5714395566)",
+      "type": "store",
+      "name": "Rodriguez Food Market",
+      "coordinates": [
+        39.9970789,
+        -75.1429592
+      ],
+      "longitude": -75.1429592,
+      "latitude": 39.9970789,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5715419365)",
+      "type": "store",
+      "name": "Y&D Deli Grocery",
+      "coordinates": [
+        39.9968188,
+        -75.1410801
+      ],
+      "longitude": -75.1410801,
+      "latitude": 39.9968188,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5715419374)",
+      "type": "store",
+      "name": "Los Mellizos Inc. Grocery",
+      "coordinates": [
+        39.9954531,
+        -75.1409238
+      ],
+      "longitude": -75.1409238,
+      "latitude": 39.9954531,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5715419412)",
+      "type": "store",
+      "name": "Dellanny Mini Market",
+      "coordinates": [
+        39.9965092,
+        -75.1386415
+      ],
+      "longitude": -75.1386415,
+      "latitude": 39.9965092,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5716245440)",
+      "type": "store",
+      "name": "A & D Grocery",
+      "coordinates": [
+        39.9958146,
+        -75.1363139
+      ],
+      "longitude": -75.1363139,
+      "latitude": 39.9958146,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5716279462)",
+      "type": "store",
+      "name": "J & J Deli Grocery",
+      "coordinates": [
+        39.9945972,
+        -75.1343159
+      ],
+      "longitude": -75.1343159,
+      "latitude": 39.9945972,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5717969766)",
+      "type": "store",
+      "name": "Palenque Mini-Market",
+      "coordinates": [
+        39.9941512,
+        -75.1323701
+      ],
+      "longitude": -75.1323701,
+      "latitude": 39.9941512,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5717969778)",
+      "type": "store",
+      "name": "Howard St Grocery",
+      "coordinates": [
+        39.9941958,
+        -75.1312044
+      ],
+      "longitude": -75.1312044,
+      "latitude": 39.9941958,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5718820407)",
+      "type": "store",
+      "name": "Andrew A Inc.",
+      "coordinates": [
+        39.997046,
+        -75.1294973
+      ],
+      "longitude": -75.1294973,
+      "latitude": 39.997046,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5721511142)",
+      "type": "store",
+      "name": "El Sol Mini Market",
+      "coordinates": [
+        39.9947073,
+        -75.1247369
+      ],
+      "longitude": -75.1247369,
+      "latitude": 39.9947073,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5884769090)",
+      "type": "store",
+      "name": "Trebol Supermarket",
+      "coordinates": [
+        39.9619665,
+        -75.1574448
+      ],
+      "longitude": -75.1574448,
+      "latitude": 39.9619665,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 5955006785)",
+      "type": "store",
+      "name": "Acme",
+      "coordinates": [
+        39.942934,
+        -75.1587786
+      ],
+      "longitude": -75.1587786,
+      "latitude": 39.942934,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 07:00-22:00",
+      "website": "https://local.acmemarkets.com/pa/philadelphia/1001-south-st.html",
+      "phone": "+1 215-238-1108"
+    },
+    {
+      "id": "store_('node', 6137927411)",
+      "type": "store",
+      "name": "L&M Variety Store",
+      "coordinates": [
+        39.9200871,
+        -75.1555007
+      ],
+      "longitude": -75.1555007,
+      "latitude": 39.9200871,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 6556392903)",
+      "type": "store",
+      "name": "No. 1 Supermarket",
+      "coordinates": [
+        39.9536402,
+        -75.155894
+      ],
+      "longitude": -75.155894,
+      "latitude": 39.9536402,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 6556417046)",
+      "type": "store",
+      "name": "New World Laundromat & Food Market",
+      "coordinates": [
+        39.9547139,
+        -75.156204
+      ],
+      "longitude": -75.156204,
+      "latitude": 39.9547139,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 6558075400)",
+      "type": "store",
+      "name": "Chestnut Food Market",
+      "coordinates": [
+        39.9495163,
+        -75.1544281
+      ],
+      "longitude": -75.1544281,
+      "latitude": 39.9495163,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 6587347319)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.9453522,
+        -75.1784297
+      ],
+      "longitude": -75.1784297,
+      "latitude": 39.9453522,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "24/7",
+      "website": "https://www.wawa.com",
+      "phone": "+1 267-538-1149"
+    },
+    {
+      "id": "store_('node', 6634083729)",
+      "type": "store",
+      "name": "ALDI",
+      "coordinates": [
+        39.9758968,
+        -75.1867777
+      ],
+      "longitude": -75.1867777,
+      "latitude": 39.9758968,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 08:30-20:00",
+      "website": "https://stores.aldi.us/pa/philadelphia/3101-west-girard-avenue",
+      "phone": "+1 844-460-7043"
+    },
+    {
+      "id": "store_('node', 6666338233)",
+      "type": "store",
+      "name": "The Fresh Grocer",
+      "coordinates": [
+        39.9402188,
+        -75.193333
+      ],
+      "longitude": -75.193333,
+      "latitude": 39.9402188,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 6677737939)",
+      "type": "store",
+      "name": "Giant",
+      "coordinates": [
+        39.954824,
+        -75.1919094
+      ],
+      "longitude": -75.1919094,
+      "latitude": 39.954824,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "07:00-22:00",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 6680703345)",
+      "type": "store",
+      "name": "Giant",
+      "coordinates": [
+        39.9448293,
+        -75.1805655
+      ],
+      "longitude": -75.1805655,
+      "latitude": 39.9448293,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 07:00-22:00",
+      "website": "https://www.heirloommarket.com/",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 6682341806)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.9490779,
+        -75.1510749
+      ],
+      "longitude": -75.1510749,
+      "latitude": 39.9490779,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "24/7",
+      "website": "https://wawa.com/",
+      "phone": "+1-267-299-6269"
+    },
+    {
+      "id": "store_('node', 6688377083)",
+      "type": "store",
+      "name": "ShopRite",
+      "coordinates": [
+        39.9196091,
+        -75.1862669
+      ],
+      "longitude": -75.1862669,
+      "latitude": 39.9196091,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 06:00-23:00",
+      "website": "https://www.shoprite.com/sm/planning/rsid/420",
+      "phone": "+1 215-336-7300"
+    },
+    {
+      "id": "store_('node', 6688453502)",
+      "type": "store",
+      "name": "ShopRite",
+      "coordinates": [
+        39.9139964,
+        -75.1547168
+      ],
+      "longitude": -75.1547168,
+      "latitude": 39.9139964,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 06:00-22:00",
+      "website": "https://www.shoprite.com/sm/planning/rsid/411",
+      "phone": "+1 215-271-2711"
+    },
+    {
+      "id": "store_('node', 6698952371)",
+      "type": "store",
+      "name": "V&S Supermarket",
+      "coordinates": [
+        39.9691521,
+        -75.1542182
+      ],
+      "longitude": -75.1542182,
+      "latitude": 39.9691521,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 6727277355)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9902979,
+        -75.1039776
+      ],
+      "longitude": -75.1039776,
+      "latitude": 39.9902979,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 6964126497)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9480126,
+        -75.1544541
+      ],
+      "longitude": -75.1544541,
+      "latitude": 39.9480126,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "24/7",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 6964126498)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9526803,
+        -75.1562587
+      ],
+      "longitude": -75.1562587,
+      "latitude": 39.9526803,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/917-filbert-ave-36493",
+      "phone": "+1 616-772-0354"
+    },
+    {
+      "id": "store_('node', 7098779262)",
+      "type": "store",
+      "name": "S&D Market",
+      "coordinates": [
+        39.9556312,
+        -75.1571992
+      ],
+      "longitude": -75.1571992,
+      "latitude": 39.9556312,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "2159288878"
+    },
+    {
+      "id": "store_('node', 7221049306)",
+      "type": "store",
+      "name": "Save-A-Lot",
+      "coordinates": [
+        39.9989573,
+        -75.1350471
+      ],
+      "longitude": -75.1350471,
+      "latitude": 39.9989573,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "https://savealot.com/grocery-stores/philadelphia-19133-60136/",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 7344746158)",
+      "type": "store",
+      "name": "Save-A-Lot",
+      "coordinates": [
+        39.9918088,
+        -75.1785084
+      ],
+      "longitude": -75.1785084,
+      "latitude": 39.9918088,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "https://savealot.com/grocery-stores/philadelphia-19132-60146/",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 7347961654)",
+      "type": "store",
+      "name": "Save-A-Lot",
+      "coordinates": [
+        39.9964833,
+        -75.1666978
+      ],
+      "longitude": -75.1666978,
+      "latitude": 39.9964833,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 7433907098)",
+      "type": "store",
+      "name": "Essene Market & Café",
+      "coordinates": [
+        39.9400144,
+        -75.1494113
+      ],
+      "longitude": -75.1494113,
+      "latitude": 39.9400144,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 7508951426)",
+      "type": "store",
+      "name": "ALDI",
+      "coordinates": [
+        39.966044,
+        -75.1597732
+      ],
+      "longitude": -75.1597732,
+      "latitude": 39.966044,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 08:30-20:00",
+      "website": "https://stores.aldi.us/pa/philadelphia/1300-fairmount-ave",
+      "phone": "+1-844-460-7169"
+    },
+    {
+      "id": "store_('node', 7768867656)",
+      "type": "store",
+      "name": "Acme",
+      "coordinates": [
+        39.9232703,
+        -75.1450437
+      ],
+      "longitude": -75.1450437,
+      "latitude": 39.9232703,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 07:00-22:00",
+      "website": "https://local.acmemarkets.com/pa/philadelphia/29-snyder-ave.html",
+      "phone": "+1 215-271-5603"
+    },
+    {
+      "id": "store_('node', 7774088838)",
+      "type": "store",
+      "name": "Tony's Food Market",
+      "coordinates": [
+        39.9163805,
+        -75.1664509
+      ],
+      "longitude": -75.1664509,
+      "latitude": 39.9163805,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "Mo-Sa 07:30-16:30",
+      "website": "nan",
+      "phone": "+1 215-389-6449"
+    },
+    {
+      "id": "store_('node', 8112409181)",
+      "type": "store",
+      "name": "Ridge Gas & Minimart",
+      "coordinates": [
+        39.9808362,
+        -75.1733508
+      ],
+      "longitude": -75.1733508,
+      "latitude": 39.9808362,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 8112413561)",
+      "type": "store",
+      "name": "Food Mart",
+      "coordinates": [
+        39.9728847,
+        -75.1782903
+      ],
+      "longitude": -75.1782903,
+      "latitude": 39.9728847,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 8157130689)",
+      "type": "store",
+      "name": "Save-A-Lot",
+      "coordinates": [
+        39.9845928,
+        -75.1212013
+      ],
+      "longitude": -75.1212013,
+      "latitude": 39.9845928,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "https://savealot.com/grocery-stores/philadelphia-19125-60134/",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 8591448455)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.9517699,
+        -75.1669708
+      ],
+      "longitude": -75.1669708,
+      "latitude": 39.9517699,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 8917693197)",
+      "type": "store",
+      "name": "7-Eleven",
+      "coordinates": [
+        39.9845036,
+        -75.1570915
+      ],
+      "longitude": -75.1570915,
+      "latitude": 39.9845036,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "https://www.7-eleven.com/locations/pa/philadelphia/2034-n-broad-st-36955",
+      "phone": "+1 215-769-4240"
+    },
+    {
+      "id": "store_('node', 9233672159)",
+      "type": "store",
+      "name": "Speedway",
+      "coordinates": [
+        39.9406328,
+        -75.1045283
+      ],
+      "longitude": -75.1045283,
+      "latitude": 39.9406328,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "24/7",
+      "website": "https://www.speedway.com/locations/NJ/Pennsauken/1420-ADMIRAL-WILSON-BLVD",
+      "phone": "+1 856 964 1694"
+    },
+    {
+      "id": "store_('node', 9310696546)",
+      "type": "store",
+      "name": "Joe's Kwik Marts",
+      "coordinates": [
+        39.9391948,
+        -75.1974898
+      ],
+      "longitude": -75.1974898,
+      "latitude": 39.9391948,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "+1 267 876 4880"
+    },
+    {
+      "id": "store_('node', 9383017166)",
+      "type": "store",
+      "name": "nan",
+      "coordinates": [
+        39.9744186,
+        -75.1833539
+      ],
+      "longitude": -75.1833539,
+      "latitude": 39.9744186,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 9442843701)",
+      "type": "store",
+      "name": "Christian street market",
+      "coordinates": [
+        39.9420032,
+        -75.1807539
+      ],
+      "longitude": -75.1807539,
+      "latitude": 39.9420032,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 9454156306)",
+      "type": "store",
+      "name": "24th st Market & Deli",
+      "coordinates": [
+        39.937472,
+        -75.1837798
+      ],
+      "longitude": -75.1837798,
+      "latitude": 39.937472,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 9454183892)",
+      "type": "store",
+      "name": "Duran Grocery Store Corp 2 Inc.",
+      "coordinates": [
+        39.9359146,
+        -75.1804358
+      ],
+      "longitude": -75.1804358,
+      "latitude": 39.9359146,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 9461384057)",
+      "type": "store",
+      "name": "nan",
+      "coordinates": [
+        39.935524,
+        -75.1894048
+      ],
+      "longitude": -75.1894048,
+      "latitude": 39.935524,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 9461440097)",
+      "type": "store",
+      "name": "nan",
+      "coordinates": [
+        39.9346063,
+        -75.1911274
+      ],
+      "longitude": -75.1911274,
+      "latitude": 39.9346063,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 9461440789)",
+      "type": "store",
+      "name": "nan",
+      "coordinates": [
+        39.9323012,
+        -75.191601
+      ],
+      "longitude": -75.191601,
+      "latitude": 39.9323012,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 9461444350)",
+      "type": "store",
+      "name": "nan",
+      "coordinates": [
+        39.9311021,
+        -75.1917063
+      ],
+      "longitude": -75.1917063,
+      "latitude": 39.9311021,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 9593113373)",
+      "type": "store",
+      "name": "MOM's Organic Market",
+      "coordinates": [
+        39.9509231,
+        -75.1586671
+      ],
+      "longitude": -75.1586671,
+      "latitude": 39.9509231,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 09:00-21:00",
+      "website": "https://momsorganicmarket.com/",
+      "phone": "+1 215 709 0022"
+    },
+    {
+      "id": "store_('node', 9611637925)",
+      "type": "store",
+      "name": "3J's Food Market",
+      "coordinates": [
+        39.9630174,
+        -75.1407143
+      ],
+      "longitude": -75.1407143,
+      "latitude": 39.9630174,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "Mo-Fr 07:00-10:00; Sa 08:00-21:00; Su 09:00-19:00",
+      "website": "https://www.3jsmarket.com/",
+      "phone": "+1 215-279-7488"
+    },
+    {
+      "id": "store_('node', 9715467004)",
+      "type": "store",
+      "name": "Old Nelson Food Co",
+      "coordinates": [
+        39.9509978,
+        -75.1615809
+      ],
+      "longitude": -75.1615809,
+      "latitude": 39.9509978,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "Mo-Fr 08:00-17:00",
+      "website": "https://oldnelsonfood.com",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 9721239018)",
+      "type": "store",
+      "name": "high times",
+      "coordinates": [
+        39.9792327,
+        -75.1629105
+      ],
+      "longitude": -75.1629105,
+      "latitude": 39.9792327,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 9742142722)",
+      "type": "store",
+      "name": "Trader Joe's",
+      "coordinates": [
+        39.9541969,
+        -75.1624251
+      ],
+      "longitude": -75.1624251,
+      "latitude": 39.9541969,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Su 08:00-21:00",
+      "website": "https://locations.traderjoes.com/pa/philadelphia/618/",
+      "phone": "+1 215-563-2170"
+    },
+    {
+      "id": "store_('node', 10124791443)",
+      "type": "store",
+      "name": "Liberty Choice",
+      "coordinates": [
+        39.9797309,
+        -75.1331644
+      ],
+      "longitude": -75.1331644,
+      "latitude": 39.9797309,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 10270198587)",
+      "type": "store",
+      "name": "Giant",
+      "coordinates": [
+        39.9627071,
+        -75.1616596
+      ],
+      "longitude": -75.1616596,
+      "latitude": 39.9627071,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "06:00-22:00",
+      "website": "https://stores.giantfoodstores.com/pa/philadelphia/510-north-broad-street",
+      "phone": "+1-215-523-6277"
+    },
+    {
+      "id": "store_('node', 10575315229)",
+      "type": "store",
+      "name": "Mulberry Market",
+      "coordinates": [
+        39.9519918,
+        -75.1446293
+      ],
+      "longitude": -75.1446293,
+      "latitude": 39.9519918,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "Su 9:00-21:00; Mo-Th 8:00-22:00; Fr-Sa 8:00-23:00",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 10647141625)",
+      "type": "store",
+      "name": "Brianette Deli Grocery",
+      "coordinates": [
+        39.9428933,
+        -75.1788902
+      ],
+      "longitude": -75.1788902,
+      "latitude": 39.9428933,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 10722831982)",
+      "type": "store",
+      "name": "Giant",
+      "coordinates": [
+        39.956471,
+        -75.1776835
+      ],
+      "longitude": -75.1776835,
+      "latitude": 39.956471,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "06:00-22:00",
+      "website": "https://stores.giantfoodstores.com/pa/philadelphia/60-north-23rd-street",
+      "phone": "+1-215-587-0270"
+    },
+    {
+      "id": "store_('node', 10733370816)",
+      "type": "store",
+      "name": "Anne's Place",
+      "coordinates": [
+        39.9737213,
+        -75.1300342
+      ],
+      "longitude": -75.1300342,
+      "latitude": 39.9737213,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "(215) 423-6883"
+    },
+    {
+      "id": "store_('node', 10983283175)",
+      "type": "store",
+      "name": "Wallies Food Inc.",
+      "coordinates": [
+        39.9633842,
+        -75.1887614
+      ],
+      "longitude": -75.1887614,
+      "latitude": 39.9633842,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "+1-215-662-0151"
+    },
+    {
+      "id": "store_('node', 11054789533)",
+      "type": "store",
+      "name": "Giant",
+      "coordinates": [
+        39.9514455,
+        -75.1538054
+      ],
+      "longitude": -75.1538054,
+      "latitude": 39.9514455,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "https://giantfoodstores.com/",
+      "phone": "+1 215 408 4830"
+    },
+    {
+      "id": "store_('node', 11328356879)",
+      "type": "store",
+      "name": "Popis",
+      "coordinates": [
+        39.9288498,
+        -75.1521204
+      ],
+      "longitude": -75.1521204,
+      "latitude": 39.9288498,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 11367729509)",
+      "type": "store",
+      "name": "Wawa",
+      "coordinates": [
+        39.9037137,
+        -75.1971159
+      ],
+      "longitude": -75.1971159,
+      "latitude": 39.9037137,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 11663473160)",
+      "type": "store",
+      "name": "Giant",
+      "coordinates": [
+        39.9665896,
+        -75.1403958
+      ],
+      "longitude": -75.1403958,
+      "latitude": 39.9665896,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 11663473187)",
+      "type": "store",
+      "name": "ALDI",
+      "coordinates": [
+        39.9179634,
+        -75.1842617
+      ],
+      "longitude": -75.1842617,
+      "latitude": 39.9179634,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "09:00-20:00",
+      "website": "https://stores.aldi.us/pa/philadelphia/2830a-s-20th-st",
+      "phone": "+1 833-460-7181"
+    },
+    {
+      "id": "store_('node', 11908749669)",
+      "type": "store",
+      "name": "Poplar Food Market",
+      "coordinates": [
+        39.9664391,
+        -75.1458053
+      ],
+      "longitude": -75.1458053,
+      "latitude": 39.9664391,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "Mo-Fr 09:00-18:00",
+      "website": "https://m.yelp.com/biz/poplar-food-market-philadelphia",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 12272528801)",
+      "type": "store",
+      "name": "Old Nelson",
+      "coordinates": [
+        39.9560454,
+        -75.194399
+      ],
+      "longitude": -75.194399,
+      "latitude": 39.9560454,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "https://www.oldnelsonfood.com",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 12536868008)",
+      "type": "store",
+      "name": "Azaan Grocery",
+      "coordinates": [
+        39.9649795,
+        -75.1657129
+      ],
+      "longitude": -75.1657129,
+      "latitude": 39.9649795,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 12539445817)",
+      "type": "store",
+      "name": "Tasha’s",
+      "coordinates": [
+        39.9743039,
+        -75.1459045
+      ],
+      "longitude": -75.1459045,
+      "latitude": 39.9743039,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 12539445818)",
+      "type": "store",
+      "name": "G&V Grocery",
+      "coordinates": [
+        39.9759056,
+        -75.147042
+      ],
+      "longitude": -75.147042,
+      "latitude": 39.9759056,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 12610169699)",
+      "type": "store",
+      "name": "Olde City Food Market",
+      "coordinates": [
+        39.9497914,
+        -75.1439995
+      ],
+      "longitude": -75.1439995,
+      "latitude": 39.9497914,
+      "amenity": "nan",
+      "shop": "supermarket",
+      "opening_hours": "Mo-Fr 08:00-20:00; Sa 10:00-21:00; Su 10:00-20:00",
+      "website": "nan",
+      "phone": "nan"
+    },
+    {
+      "id": "store_('node', 12647784501)",
+      "type": "store",
+      "name": "Old Nelson Food Company",
+      "coordinates": [
+        39.9545413,
+        -75.1711775
+      ],
+      "longitude": -75.1711775,
+      "latitude": 39.9545413,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "https://www.oldnelsonfood.com/pages-static/home",
+      "phone": "(267) 773-8089"
+    },
+    {
+      "id": "store_('node', 12950502101)",
+      "type": "store",
+      "name": "South Philly Food Co-op",
+      "coordinates": [
+        39.9245413,
+        -75.168184
+      ],
+      "longitude": -75.168184,
+      "latitude": 39.9245413,
+      "amenity": "nan",
+      "shop": "grocery",
+      "opening_hours": "Mo-Su 08:00-21:00",
+      "website": "https://www.southphillyfood.coop/",
+      "phone": "+1 215-920-1100"
+    },
+    {
+      "id": "store_('node', 13125217415)",
+      "type": "store",
+      "name": "North 20th Mini Market LLC",
+      "coordinates": [
+        39.9644077,
+        -75.1706916
+      ],
+      "longitude": -75.1706916,
+      "latitude": 39.9644077,
+      "amenity": "nan",
+      "shop": "convenience",
+      "opening_hours": "nan",
+      "website": "nan",
+      "phone": "nan"
+    }
+  ],
+  "metadata": {
+    "total_water_fountains": 9,
+    "total_stores": 198,
+    "bbox": [
+      40.0,
+      39.9,
+      -75.1,
+      -75.2
+    ],
+    "last_updated": "2025-09-20T12:12:10.417023"
+  }
+}

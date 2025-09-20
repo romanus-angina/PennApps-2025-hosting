@@ -22,3 +22,20 @@ frontend/.env.*.local
 backend/.env
 backend/.env.local
 backend/.env.*.local
+
+# Backend generated data / caches
+backend/data/
+
+# osmnx / requests-cache
+.cache/osmnx/
+.osmnx_cache/
+requests-cache.sqlite
+
+# ignore generated/cache/data
+backend/data/
+*.sqlite
+*.cache
+.osmnx_cache/
+.cache/
+requests-cache.sqlite
+
