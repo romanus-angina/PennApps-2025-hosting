@@ -10,6 +10,19 @@ dist/
 # VSCode
 .vscode/
 
+# env files
+.env
+.env.local
+.env.*.local
+
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+backend/.env
+backend/.env.local
+backend/.env.*.local
+
 # Backend generated data / caches
 backend/data/
 
@@ -25,3 +38,4 @@ backend/data/
 .osmnx_cache/
 .cache/
 requests-cache.sqlite
+

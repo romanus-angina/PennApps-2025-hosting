@@ -1,12 +1,49 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PennApps Demo</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shady Route Demo</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <style>
+    /* Make the React root and the map fill the entire viewport */
+
+    html,
+    body,
+    #root {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    /* The map DIV created by Map.tsx */
+    #map {
+      position: fixed;
+      inset: 0;
+    }
+
+    /* top/right/bottom/left: 0 */
+
+    /* Ensure ShadeMap's canvas fully covers the map container */
+    .leaflet-pane.shadows,
+    .leaflet-pane.shadows canvas {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
