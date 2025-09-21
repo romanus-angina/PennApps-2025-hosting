@@ -1,45 +1,34 @@
+// src/components/Map.tsx
 import { useEffect, useRef, useState, useCallback } from "react";
 import * as L from "leaflet";
-// ShadeMap should be available as L.shadeMap() after import
+import "leaflet/dist/leaflet.css";
+
+// ShadeMap → adds L.shadeMap(...)
 import "leaflet-shadow-simulator";
-// @ts-ignore – shim in src/types
+// @ts-ignore – local shim in src/types
 import osmtogeojson from "osmtogeojson";
 
-// Fix default icon path issues in Vite
-const iconRetinaUrl = new URL('leaflet/dist/images/marker-icon-2x.png', import.meta.url).href;
-const iconUrl = new URL('leaflet/dist/images/marker-icon.png', import.meta.url).href;
-const shadowUrl = new URL('leaflet/dist/images/marker-shadow.png', import.meta.url).href;
+import AddressSearch from "./AddressSearch";
 
+// ---------- Icons fix for Vite ----------
+const iconRetinaUrl = new URL("leaflet/dist/images/marker-icon-2x.png", import.meta.url).href;
+const iconUrl = new URL("leaflet/dist/images/marker-icon.png", import.meta.url).href;
+const shadowUrl = new URL("leaflet/dist/images/marker-shadow.png", import.meta.url).href;
 delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl,
-  iconUrl,
-  shadowUrl
-});
+L.Icon.Default.mergeOptions({ iconRetinaUrl, iconUrl, shadowUrl });
 
-// Create custom icons for start and end points
 const startIcon = new L.Icon({
-  iconUrl: iconUrl,
-  iconRetinaUrl: iconRetinaUrl,
-  shadowUrl: shadowUrl,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-  className: 'start-marker'
+  iconUrl, iconRetinaUrl, shadowUrl,
+  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
+  className: "start-marker",
 });
-
 const endIcon = new L.Icon({
-  iconUrl: iconUrl,
-  iconRetinaUrl: iconRetinaUrl,
-  shadowUrl: shadowUrl,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-  className: 'end-marker'
+  iconUrl, iconRetinaUrl, shadowUrl,
+  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
+  className: "end-marker",
 });
 
+// ---------- Types ----------
 type Pt = { lat: number; lng: number };
 export type Edge = { id: string; a: Pt; b: Pt };
 export type EdgeResult = { id: string; shadePct: number; shaded: boolean; nSamples: number };
@@ -113,8 +102,6 @@ export default function Map({
     error: null,
     routeStats: undefined
   });
-
-  // State only for UI updates
   const [pathUIState, setPathUIState] = useState<PathState>({
     startPoint: null,
     endPoint: null,
@@ -461,7 +448,6 @@ export default function Map({
   // Handle map clicks for pathfinding (basic version without backend)
   const handleMapClick = useCallback(async (e: L.LeafletMouseEvent) => {
     if (pathStateRef.current.loading) return;
-
     const { lat, lng } = e.latlng;
     console.log("Map clicked for pathfinding at:", lat, lng);
 
@@ -533,6 +519,7 @@ export default function Map({
     }
   }, []);
 
+  // attach click handler after map created
   useEffect(() => {
     console.log("TestMap useEffect triggered - Map setup");
     
@@ -679,18 +666,13 @@ export default function Map({
     maxSteps = 20,
     earlyExit = true,
   } = {}): Promise<EdgeResult[]> {
-    const map = mapRef.current;
-    const shade = shadeRef.current;
-
-    if (!map || !shade || !ready) {
-      console.warn('Map or shade layer not ready for classification');
-      return [];
-    }
+    const map = mapRef.current, shade = shadeRef.current;
+    if (!map || !shade || !ready) return [];
 
     const rect = map.getContainer().getBoundingClientRect();
     const out: EdgeResult[] = [];
-
     const BATCH = 300;
+
     for (let i = 0; i < edges.length; i += BATCH) {
       const chunk = edges.slice(i, i + BATCH);
       const part = await Promise.all(
@@ -702,34 +684,24 @@ export default function Map({
           for (let j = 0; j <= steps; j++) {
             const t = steps === 0 ? 0.5 : j / steps;
             const base = lerp(e.a, e.b, t);
-
             for (let s = 0; s < samplesPerPoint; s++) {
               const p = jitterMeters(base, jitterRadius);
               const cp = map.latLngToContainerPoint([p.lat, p.lng]);
-
-              if (cp.x < 0 || cp.y < 0 || cp.x >= rect.width || cp.y >= rect.height) {
-                continue;
-              }
-
+              if (cp.x < 0 || cp.y < 0 || cp.x >= rect.width || cp.y >= rect.height) continue;
               const xWin = rect.left + cp.x;
               const yWin = window.innerHeight - (rect.top + cp.y);
-
               try {
                 const rgba: Uint8ClampedArray = shade.readPixel(xWin, yWin);
                 if (rgba && isShadowRGBA(rgba, alphaThreshold)) hits++;
                 total++;
-              } catch (e) {
-                console.warn('Error reading pixel:', e);
-              }
+              } catch { /* ignore */ }
             }
-
             if (earlyExit && total >= 6) {
               const remaining = (steps - j) * samplesPerPoint;
               if (hits === total && remaining < total / 2) break;
               if (hits === 0 && remaining < total / 2) break;
             }
           }
-
           const shadePct = total ? hits / total : 0;
           return { id: e.id, shadePct, shaded: shadePct >= 0.5, nSamples: total };
         })
@@ -742,29 +714,17 @@ export default function Map({
     return out;
   }
 
-  // Expose for console testing
-  useEffect(() => {
-    // @ts-ignore
-    window.__classifyEdges = classify;
-  }, []);
-
   async function classifyAndDraw() {
-    if (!ready) {
-      console.warn('Shade layer not ready yet');
-      return;
-    }
-
+    if (!ready || edges.length === 0) return;
     const results = await classify();
     const layer = edgeLayerRef.current!;
     layer.clearLayers();
-
     for (const e of edges) {
       const r = results.find((x) => x.id === e.id);
       const pct = r?.shadePct ?? 0;
-      L.polyline(
-        [[e.a.lat, e.a.lng], [e.b.lat, e.b.lng]],
-        { color: colorForPct(pct), weight: 6, opacity: 0.9 }
-      )
+      L.polyline([[e.a.lat, e.a.lng], [e.b.lat, e.b.lng]], {
+        color: colorForPct(pct), weight: 6, opacity: 0.9,
+      })
         .bindTooltip(`shade: ${(pct * 100).toFixed(0)}% (${r?.nSamples || 0} samples)`)
         .addTo(layer);
     }
