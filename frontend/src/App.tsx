@@ -1,6 +1,5 @@
-import ShadeClassifier, { Edge } from "./components/Map";
 import EdgeAnalysis from "./components/EdgeAnalysis";
-import TestMap from "./components/TestMap";
+import Map from "./components/Map";
 import { useMemo, useState, useEffect } from "react";
 
 export default function App() {
@@ -45,13 +44,5 @@ export default function App() {
     return <EdgeAnalysis onBack={() => navigateToPage('map')} />;
   }
 
-  if (currentPage === 'test') {
-    return <TestMap />;
-  }
-
-  return (
-    <div style={{ height: "100%" }}>
-      <ShadeClassifier edges={edges} date={date} onResults={(r) => console.log("edge shades:", r)} />
-    </div>
-  );
+  return <Map />;
 }
