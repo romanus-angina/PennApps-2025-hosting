@@ -43,9 +43,9 @@ class TreeShadowGenerator:
         self.METERS_PER_DEGREE_LAT = 111000  # ~111km per degree latitude
         self.MIN_DENSITY = 0.2
         self.MAX_DENSITY = 1.0
-        self.MIN_RADIUS = 1.0  # meters
-        self.MAX_RADIUS = 5.0  # meters
-        self.POLYGON_POINTS = 16
+        self.MIN_RADIUS = 8.0  # meters - increased for better visibility
+        self.MAX_RADIUS = 25.0  # meters - much larger for route impact
+        self.POLYGON_POINTS = 24  # more points for smoother curves
         
         logger.info(f"TreeShadowGenerator initialized with data path: {tree_data_path}")
     
@@ -125,30 +125,61 @@ class TreeShadowGenerator:
         
         return lat_degrees, lng_degrees
     
-    def generate_circular_polygon(self, center_lat: float, center_lng: float, radius_meters: float) -> List[List[float]]:
+    def generate_organic_tree_canopy(self, center_lat: float, center_lng: float, radius_meters: float, tree_id: int = 0) -> List[List[float]]:
         """
-        Generate a circular polygon with specified center and radius.
+        Generate an organic, tree canopy-like polygon with wavy edges.
         
         Args:
             center_lat: Center latitude
             center_lng: Center longitude
-            radius_meters: Radius in meters
+            radius_meters: Base radius in meters
+            tree_id: Tree ID for consistent randomization
             
         Returns:
-            List of [lng, lat] coordinate pairs forming a polygon
+            List of [lng, lat] coordinate pairs forming an organic polygon
         """
         coordinates = []
         
         # Convert radius to degrees
         lat_degrees, lng_degrees = self.meters_to_degrees(radius_meters, center_lat)
         
-        # Generate points around the circle
+        # Use tree_id as seed for consistent but varied shapes per tree
+        import random
+        random.seed(tree_id)
+        
+        # Generate multiple frequency components for organic variation
+        # Primary wave (large lobes)
+        primary_freq = random.uniform(3, 7)  # 3-7 major lobes
+        primary_amplitude = random.uniform(0.2, 0.4)  # 20-40% radius variation
+        
+        # Secondary wave (smaller bumps)
+        secondary_freq = random.uniform(8, 16)  # 8-16 smaller variations
+        secondary_amplitude = random.uniform(0.1, 0.2)  # 10-20% radius variation
+        
+        # Tertiary wave (fine detail)
+        tertiary_freq = random.uniform(20, 32)  # 20-32 fine details
+        tertiary_amplitude = random.uniform(0.05, 0.1)  # 5-10% radius variation
+        
+        # Generate points around the organic shape
         for i in range(self.POLYGON_POINTS):
             angle = 2 * math.pi * i / self.POLYGON_POINTS
             
+            # Calculate organic radius variation using multiple sine waves
+            primary_variation = math.sin(primary_freq * angle) * primary_amplitude
+            secondary_variation = math.sin(secondary_freq * angle) * secondary_amplitude
+            tertiary_variation = math.sin(tertiary_freq * angle) * tertiary_amplitude
+            
+            # Combine variations for organic shape (always positive radius)
+            radius_multiplier = 1.0 + primary_variation + secondary_variation + tertiary_variation
+            radius_multiplier = max(0.3, radius_multiplier)  # Ensure minimum 30% of base radius
+            
+            # Apply organic radius to base coordinates
+            organic_lat_degrees = lat_degrees * radius_multiplier
+            organic_lng_degrees = lng_degrees * radius_multiplier
+            
             # Calculate point coordinates
-            point_lat = center_lat + lat_degrees * math.sin(angle)
-            point_lng = center_lng + lng_degrees * math.cos(angle)
+            point_lat = center_lat + organic_lat_degrees * math.sin(angle)
+            point_lng = center_lng + organic_lng_degrees * math.cos(angle)
             
             # GeoJSON uses [longitude, latitude] format
             coordinates.append([point_lng, point_lat])
@@ -159,7 +190,7 @@ class TreeShadowGenerator:
         return coordinates
     
     def generate_shadow_polygons(self) -> None:
-        """Generate circular shadow polygons for all filtered trees."""
+        """Generate organic tree canopy shadow polygons for all filtered trees."""
         if not self.filtered_trees:
             logger.warning("No filtered trees available. Call filter_trees_by_density() first.")
             return
@@ -181,8 +212,8 @@ class TreeShadowGenerator:
                 # Calculate shadow radius based on density
                 radius = self.density_to_radius(density)
                 
-                # Generate circular polygon
-                polygon_coords = self.generate_circular_polygon(latitude, longitude, radius)
+                # Generate organic tree canopy polygon
+                polygon_coords = self.generate_organic_tree_canopy(latitude, longitude, radius, tree_id)
                 
                 # Create GeoJSON feature
                 feature = {
@@ -228,7 +259,8 @@ class TreeShadowGenerator:
                 "description": "Tree shadow polygons for route planning",
                 "density_filter": f">= {self.MIN_DENSITY}",
                 "radius_mapping": f"density [{self.MIN_DENSITY}, {self.MAX_DENSITY}] -> radius [{self.MIN_RADIUS}m, {self.MAX_RADIUS}m]",
-                "polygon_points": self.POLYGON_POINTS
+                "polygon_points": self.POLYGON_POINTS,
+                "shape_type": "organic_tree_canopy"
             },
             "features": self.shadow_polygons
         }

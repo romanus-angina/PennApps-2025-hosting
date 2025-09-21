@@ -293,22 +293,24 @@ export default function Map({
               // Convert GeoJSON coordinates [lng, lat] to Leaflet format [lat, lng]
               const leafletCoords = geometry.coordinates[0].map((coord: [number, number]) => [coord[1], coord[0]]);
               
-              // Create polygon with tree shadow styling
+              // Create polygon with enhanced tree shadow styling
               const polygon = L.polygon(leafletCoords, {
-                fillColor: '#01112f',
-                color: '#01112f',
-                fillOpacity: 0.5,
-                opacity: 0.7,
-                weight: 1
+                fillColor: '#2d5016',  // Forest green for tree canopy
+                color: '#1a3d0a',      // Darker green border
+                fillOpacity: 0.4,      // More transparent for layering
+                opacity: 0.8,          // Stronger border
+                weight: 2,             // Thicker border for definition
+                className: 'tree-shadow-polygon'
               });
 
               // Add hover tooltip with tree information
               const tooltipContent = `
-                <div style="font-size: 12px; line-height: 1.4;">
-                  <strong>Tree Shadow</strong><br/>
-                  ID: ${properties.tree_id || properties.id || 'Unknown'}<br/>
-                  Density: ${properties.density ? properties.density.toFixed(2) : 'Unknown'}<br/>
-                  Radius: ${properties.shadow_radius_m || 'Unknown'}m
+                <div style="font-size: 12px; line-height: 1.4; background: rgba(255,255,255,0.95); padding: 8px; border-radius: 4px;">
+                  <strong>🌳 Tree Canopy Shadow</strong><br/>
+                  <span style="color: #666;">ID:</span> ${properties.tree_id || properties.id || 'Unknown'}<br/>
+                  <span style="color: #666;">Density:</span> ${properties.density ? properties.density.toFixed(2) : 'Unknown'}<br/>
+                  <span style="color: #666;">Canopy Radius:</span> ${properties.shadow_radius_m || 'Unknown'}m<br/>
+                  <span style="color: #666;">Shape:</span> Organic Tree Canopy
                 </div>
               `;
               
