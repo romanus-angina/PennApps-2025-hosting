@@ -10,6 +10,15 @@ import pickle
 from contextlib import asynccontextmanager
 from tree_shadows import precompute_tree_shadows, get_tree_shadow_generator
 
+import os
+
+# Environment-based CORS configuration
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+
+print(f"🌍 Environment: {ENVIRONMENT}")
+print(f"🔗 Allowed Origins: {ALLOWED_ORIGINS}")
+
 # Global graph variable
 G: Optional[nx.Graph] = None
 geod = Geod(ellps="WGS84")
@@ -63,14 +72,35 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="PennApps Demo Backend", lifespan=lifespan)
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your frontend domain
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if ENVIRONMENT == "production":
+    # Production CORS settings
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=ALLOWED_ORIGINS,  # Specific domains only
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
+        allow_headers=["*"],
+    )
+else:
+    # Development CORS settings (more permissive)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Allow all origins in development
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+# Add environment info endpoint
+@app.get("/info")
+async def app_info():
+    """Get application information"""
+    return {
+        "app": "ShadeNav Backend",
+        "environment": ENVIRONMENT,
+        "version": "1.0.0",
+        "allowed_origins": ALLOWED_ORIGINS
+    }
 
 
 def find_nearest_node(lat: float, lon: float) -> Optional[Tuple[float, float]]:
