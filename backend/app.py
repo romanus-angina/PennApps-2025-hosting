@@ -275,7 +275,6 @@ def calculate_shade_aware_weight(edge_attrs: Dict[str, Any], shade_penalty: floa
     
     # Apply penalty: base_weight + (shade_length × penalty_factor)
     return base_weight + ((base_weight - shade_length) * shade_penalty)
-    # return base_weight + (shade_length * shade_penalty)
 
 
 @app.post("/shortest_path_shade")
@@ -563,3 +562,4 @@ async def get_tree_shadow_stats() -> Dict[str, Any]:
     except Exception as e:
         print(f"❌ Error getting tree shadow stats: {e}")
         return {"error": f"Failed to get tree shadow statistics: {str(e)}"}
+

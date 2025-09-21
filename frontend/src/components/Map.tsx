@@ -8,7 +8,7 @@ import "leaflet-shadow-simulator";
 // @ts-ignore – local shim in src/types
 import osmtogeojson from "osmtogeojson";
 
-import AddressSearch from "./AddressSearch";
+// import AddressSearch from "./AddressSearch"; // Not used in this component
 
 // ---------- Icons fix for Vite ----------
 const iconRetinaUrl = new URL("leaflet/dist/images/marker-icon-2x.png", import.meta.url).href;
@@ -35,7 +35,165 @@ export type EdgeResult = { id: string; shadePct: number; shaded: boolean; nSampl
 
 function metersToLatDeg(m: number) { return m / 110540; }
 function metersToLngDeg(m: number, lat: number) { return m / (111320 * Math.cos(lat * Math.PI / 180)); }
-function isShadowRGBA(arr: Uint8ClampedArray, alphaThreshold = 16) { return arr[3] >= alphaThreshold; }
+
+// Function to sample pixels directly from Leaflet map canvas
+function sampleMapPixel(map: L.Map, x: number, y: number): Uint8ClampedArray | null {
+  try {
+    // Get the map container element
+    const mapContainer = map.getContainer();
+    
+    // Try different canvas selectors - Leaflet can use different rendering methods
+    let canvas = mapContainer.querySelector('canvas');
+    if (!canvas) {
+      // Try looking in panes
+      canvas = mapContainer.querySelector('.leaflet-overlay-pane canvas');
+    }
+    if (!canvas) {
+      canvas = mapContainer.querySelector('.leaflet-map-pane canvas');
+    }
+    
+    if (!canvas) {
+      console.warn('🚨 No canvas found in map container - tree shadows may use SVG');
+      return null;
+    }
+    
+    // Get 2D context and sample pixel
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.warn('Could not get 2D context from canvas');
+      return null;
+    }
+    
+    // Sample 1x1 pixel at the specified coordinates
+    const imageData = ctx.getImageData(x, y, 1, 1);
+    console.log(`📍 Canvas sample at (${x},${y}): R=${imageData.data[0]}, G=${imageData.data[1]}, B=${imageData.data[2]}, A=${imageData.data[3]}`);
+    return imageData.data;
+  } catch (error) {
+    console.warn('Error sampling map pixel:', error);
+    return null;
+  }
+}
+
+// Check if a geographic point is inside any tree shadow polygon in the given layer
+function isPointInTreeShadowLayer(treeShadowLayer: L.LayerGroup, latlng: [number, number]): boolean {
+  try {
+    if (!treeShadowLayer) {
+      console.warn('🚨 Tree shadow layer is null/undefined');
+      return false;
+    }
+    
+    // Count layers for debugging
+    let polygonCount = 0;
+    let totalLayerCount = 0;
+    
+    // Check if point is inside any tree shadow polygon
+    let isInside = false;
+    treeShadowLayer.eachLayer((layer: any) => {
+      totalLayerCount++;
+      if (layer instanceof L.Polygon) {
+        polygonCount++;
+        // Use Leaflet's built-in point-in-polygon check
+        const latLng = L.latLng(latlng[0], latlng[1]);
+        const polygonPoints = layer.getLatLngs()[0] as L.LatLng[];
+        const bounds = layer.getBounds();
+        
+        // Enhanced debugging for first few polygons
+        if (polygonCount <= 3) {
+          const pointInBounds = bounds.contains(latLng);
+          console.log(`🔍 Polygon ${polygonCount}: bounds [${bounds.getSouth().toFixed(6)}, ${bounds.getWest().toFixed(6)}] to [${bounds.getNorth().toFixed(6)}, ${bounds.getEast().toFixed(6)}] - Point in bounds: ${pointInBounds}`);
+        }
+        
+        if (isPointInPolygon(latLng, polygonPoints)) {
+          console.log(`🎯 HIT! Point [${latlng[0].toFixed(6)}, ${latlng[1].toFixed(6)}] is inside tree shadow polygon ${polygonCount}`);
+          console.log(`🎯 Polygon bounds: [${bounds.getSouth().toFixed(6)}, ${bounds.getWest().toFixed(6)}] to [${bounds.getNorth().toFixed(6)}, ${bounds.getEast().toFixed(6)}]`);
+          isInside = true;
+          return false; // Break out of eachLayer
+        }
+      }
+    });
+    
+    // Debug info (log occasionally)
+    if (Math.random() < 0.001) {
+      console.log(`🔍 Tree shadow layer has ${totalLayerCount} total layers, ${polygonCount} polygons`);
+    }
+    
+    return isInside;
+  } catch (error) {
+    console.warn('Error checking point in tree shadow:', error);
+    return false;
+  }
+}
+
+// Point-in-polygon algorithm (ray casting)
+function isPointInPolygon(point: L.LatLng, polygon: L.LatLng[]): boolean {
+  const x = point.lng;  // ✅ FIXED: longitude is X (horizontal)
+  const y = point.lat;  // ✅ FIXED: latitude is Y (vertical)
+  let inside = false;
+  
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].lng;  // ✅ FIXED: longitude is X
+    const yi = polygon[i].lat;  // ✅ FIXED: latitude is Y
+    const xj = polygon[j].lng;  // ✅ FIXED: longitude is X
+    const yj = polygon[j].lat;  // ✅ FIXED: latitude is Y
+    
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+      inside = !inside;
+    }
+  }
+  
+  return inside;
+}
+
+// Test function to verify ray-casting algorithm with known coordinates
+function testRayCastingAlgorithm() {
+  console.log("🧪 Testing ray-casting algorithm...");
+  
+  // Create a simple square polygon for testing
+  const testPolygon = [
+    L.latLng(39.948, -75.153),  // Top-left
+    L.latLng(39.948, -75.152),  // Top-right
+    L.latLng(39.947, -75.152),  // Bottom-right
+    L.latLng(39.947, -75.153),  // Bottom-left
+  ];
+  
+  // Test points
+  const insidePoint = L.latLng(39.9475, -75.1525);  // Should be inside
+  const outsidePoint = L.latLng(39.946, -75.151);   // Should be outside
+  
+  const insideResult = isPointInPolygon(insidePoint, testPolygon);
+  const outsideResult = isPointInPolygon(outsidePoint, testPolygon);
+  
+  console.log(`🧪 Inside point test: ${insideResult} (expected: true)`);
+  console.log(`🧪 Outside point test: ${outsideResult} (expected: false)`);
+  
+  if (insideResult && !outsideResult) {
+    console.log("✅ Ray-casting algorithm test PASSED");
+  } else {
+    console.log("❌ Ray-casting algorithm test FAILED");
+  }
+}
+function isShadowRGBA(arr: Uint8ClampedArray, alphaThreshold = 16) { 
+  // Check for sufficient alpha (transparency)
+  if (arr[3] < alphaThreshold) return false;
+  
+  const r = arr[0], g = arr[1], b = arr[2], a = arr[3];
+  
+  // Debug: Log actual colors being sampled (remove after debugging)
+  if (Math.random() < 0.1) { // Log 10% of samples for debugging
+    console.log(`🔍 Pixel sample: R=${r}, G=${g}, B=${b}, A=${a}`);
+  }
+  
+  // Check for shadow-like colors with broader tolerance
+  // Both building shadows and tree shadow polygons should be detected
+  const isDarkish = (r + g + b) < 150;  // Generally dark
+  const hasBlueish = b > Math.max(r, g); // More blue than red/green
+  const isShadowColor = isDarkish && hasBlueish;
+  
+  // Original strict detection (for comparison)
+  const isStrictShadow = (r <= 10 && g <= 25 && b >= 35);
+  
+  return isShadowColor || isStrictShadow;
+}
 function lerp(a: Pt, b: Pt, t: number): Pt { return { lat: a.lat + (b.lat - a.lat) * t, lng: a.lng + (b.lng - a.lng) * t }; }
 function jitterMeters(p: Pt, r: number): Pt {
   if (!r) return p;
@@ -93,6 +251,7 @@ export default function Map({
   const [shadePenalty, setShadePenalty] = useState(1.0); // Shade avoidance factor
   const [useShadeRouting, setUseShadeRouting] = useState(true); // Toggle for shade-aware routing
   const [showTreeShadows, setShowTreeShadows] = useState(false); // Toggle for tree shadows
+  const showTreeShadowsRef = useRef(false); // Ref to track current state
   const fetchTokenRef = useRef(0);
 
   // Use refs instead of state to avoid re-renders for pathfinding
@@ -293,13 +452,13 @@ export default function Map({
               // Convert GeoJSON coordinates [lng, lat] to Leaflet format [lat, lng]
               const leafletCoords = geometry.coordinates[0].map((coord: [number, number]) => [coord[1], coord[0]]);
               
-              // Create polygon with enhanced tree shadow styling
+              // Create polygon with shadow styling to match building shadows
               const polygon = L.polygon(leafletCoords, {
-                fillColor: '#2d5016',  // Forest green for tree canopy
-                color: '#1a3d0a',      // Darker green border
-                fillOpacity: 0.4,      // More transparent for layering
-                opacity: 0.8,          // Stronger border
-                weight: 2,             // Thicker border for definition
+                fillColor: '#01112f',  // Same as building shadows
+                color: '#01112f',      // Same border color
+                fillOpacity: 0.5,      // Semi-transparent like building shadows
+                opacity: 0.7,          // Match building shadow opacity
+                weight: 1,             // Thin border
                 className: 'tree-shadow-polygon'
               });
 
@@ -332,6 +491,10 @@ export default function Map({
         });
 
         console.log(`✅ Successfully rendered ${data.features.length} tree shadow polygons`);
+        
+        // Debug: Check if tree shadows are visible
+        console.log(`🔍 Tree shadow layer has ${treeShadowLayer.getLayers().length} layers`);
+        console.log(`🎨 Tree shadow styling: fillColor=#01112f, fillOpacity=0.5, opacity=0.7`);
       } else {
         console.warn("No tree shadow features found in response");
       }
@@ -362,6 +525,7 @@ export default function Map({
     const map = mapRef.current;
     const shade = shadeRef.current;
     const pathLayer = pathLayerRef.current;
+    const treeShadowLayer = treeShadowLayerRef.current;
     
     // Always clear existing path content first
     const markers: L.Marker[] = [];
@@ -373,61 +537,132 @@ export default function Map({
     pathLayer.clearLayers();
     markers.forEach(marker => pathLayer.addLayer(marker));
     
-    // Try shade analysis if shade layer is ready, otherwise just render path
+    // Always run shade analysis for tree shadows (independent of building shadow layer)
     let pathResults: EdgeResult[] = [];
     
-    if (ready && shade) {
-      console.log("🌞 Running shade analysis on path");
-      // Convert path to edges for analysis
-      const pathEdges: Edge[] = pathCoords.slice(0, -1).map((point, i) => ({
-        id: `path-${i}`,
-        a: { lat: point[0], lng: point[1] },
-        b: { lat: pathCoords[i + 1][0], lng: pathCoords[i + 1][1] }
-      }));
-
-      // Analyze each path segment
-      const rect = map.getContainer().getBoundingClientRect();
-
-      for (const edge of pathEdges) {
-        const lenM = L.latLng(edge.a).distanceTo(L.latLng(edge.b));
-        const steps = Math.min(Math.max(1, Math.ceil(lenM / 10)), 20);
-        let hits = 0, total = 0;
-
-        for (let j = 0; j <= steps; j++) {
-          const t = steps === 0 ? 0.5 : j / steps;
-          const base = lerp(edge.a, edge.b, t);
-
-          for (let s = 0; s < 3; s++) {
-            const p = jitterMeters(base, 1.5);
-            const cp = map.latLngToContainerPoint([p.lat, p.lng]);
-
-            if (cp.x < 0 || cp.y < 0 || cp.x >= rect.width || cp.y >= rect.height) {
-              continue;
-            }
-
-            const xWin = rect.left + cp.x;
-            const yWin = window.innerHeight - (rect.top + cp.y);
-
-            try {
-              const rgba: Uint8ClampedArray = shade.readPixel(xWin, yWin);
-              if (rgba && isShadowRGBA(rgba, 16)) hits++;
-              total++;
-            } catch (e) {
-              console.warn('Error reading pixel for path analysis:', e);
-            }
-          }
-        }
-
-        const shadePct = total ? hits / total : 0;
-        pathResults.push({
-          id: edge.id,
-          shadePct,
-          shaded: shadePct >= 0.5,
-          nSamples: total
-        });
+    console.log("🌞 Running shade analysis for tree shadows");
+    
+    // Debug: Check tree shadow layer state
+    console.log(`🔍 Tree shadow layer available: ${!!treeShadowLayer}`);
+    console.log(`🔍 Show tree shadows state: ${showTreeShadows}`);
+    console.log(`🔍 Show tree shadows ref: ${showTreeShadowsRef.current}`);
+    console.log(`🔍 Current time: ${new Date().toISOString()}`);
+    if (treeShadowLayer) {
+      let layerCount = 0;
+      treeShadowLayer.eachLayer(() => layerCount++);
+      console.log(`🔍 Tree shadow layer has ${layerCount} layers`);
+      
+      if (layerCount === 0) {
+        console.log("⚠️ Tree shadow layer is empty - attempting to load tree shadows");
+        // Force load tree shadows for analysis
+        await loadTreeShadows();
+        // Recount after loading
+        layerCount = 0;
+        treeShadowLayer.eachLayer(() => layerCount++);
+        console.log(`🔄 After loading: Tree shadow layer has ${layerCount} layers`);
       }
     } else {
-      console.log("⚠️ Shade layer not ready, rendering path without shade analysis");
+      console.log("💡 Tree shadow layer not available - loading for path analysis");
+      await loadTreeShadows();
+      const tempTreeShadowLayer = treeShadowLayerRef.current;
+      if (tempTreeShadowLayer) {
+        let layerCount = 0;
+        tempTreeShadowLayer.eachLayer(() => layerCount++);
+        console.log(`🔄 After loading: Tree shadow layer has ${layerCount} layers`);
+      }
+    }
+    
+    // Convert path to edges for analysis
+    const pathEdges: Edge[] = pathCoords.slice(0, -1).map((point, i) => ({
+      id: `path-${i}`,
+      a: { lat: point[0], lng: point[1] },
+      b: { lat: pathCoords[i + 1][0], lng: pathCoords[i + 1][1] }
+    }));
+    
+    // Debug: Log the first few path edges
+    console.log("🔗 Created", pathEdges.length, "path edges:");
+    pathEdges.slice(0, 3).forEach((edge, i) => {
+      console.log(`   Edge ${i}: [${edge.a.lat.toFixed(6)}, ${edge.a.lng.toFixed(6)}] → [${edge.b.lat.toFixed(6)}, ${edge.b.lng.toFixed(6)}]`);
+    });
+
+    // Analyze each path segment using canvas pixel sampling
+    const rect = map.getContainer().getBoundingClientRect();
+
+    for (const edge of pathEdges) {
+      const lenM = L.latLng(edge.a).distanceTo(L.latLng(edge.b));
+      const steps = Math.min(Math.max(1, Math.ceil(lenM / 10)), 20);
+      let hits = 0, total = 0;
+
+      for (let j = 0; j <= steps; j++) {
+        const t = steps === 0 ? 0.5 : j / steps;
+        const base = lerp(edge.a, edge.b, t);
+        
+        // Debug: Log base coordinates for first few samples
+        if (total < 10) {
+          console.log(`🎯 Base point ${total}: [${base.lat.toFixed(6)}, ${base.lng.toFixed(6)}] (before jitter)`);
+        }
+
+        for (let s = 0; s < 3; s++) {
+          const p = jitterMeters(base, 0.1); // Reduced jitter from 1.5m to 0.1m for testing
+          const cp = map.latLngToContainerPoint([p.lat, p.lng]);
+
+          if (cp.x < 0 || cp.y < 0 || cp.x >= rect.width || cp.y >= rect.height) {
+            continue;
+          }
+
+          try {
+            // Check for shade - either building shadows (pixel) or tree shadows (DOM)
+            let isShaded = false;
+            
+            if (shade && !showTreeShadowsRef.current) {
+              // Use building shadow layer if available and tree shadows are disabled
+              if (total === 0) {
+                console.log("🏢 Using building shadow pixel sampling (tree shadows disabled)");
+              }
+              const xWin = rect.left + cp.x;
+              const yWin = window.innerHeight - (rect.top + cp.y);
+              const rgba = shade.readPixel(xWin, yWin);
+              isShaded = rgba && isShadowRGBA(rgba, 16);
+            } else {
+              // Check if point is under a tree shadow polygon (geometric)
+              const currentTreeShadowLayer = treeShadowLayerRef.current; // Get current reference
+              if (currentTreeShadowLayer) {
+                // Debug: Log when we're using geometric detection
+                if (total === 0) {
+                  console.log("🌳 Using geometric tree shadow detection (tree shadows enabled)");
+                }
+                isShaded = isPointInTreeShadowLayer(currentTreeShadowLayer, [p.lat, p.lng]);
+                // Enhanced debugging - log ALL samples for first few segments
+                if (total < 20) { // Debug first 20 samples
+                  console.log(`🔍 Sample ${total}: [${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}] (jittered from [${base.lat.toFixed(6)}, ${base.lng.toFixed(6)}]) -> ${isShaded ? '✅ SHADED' : '❌ not shaded'}`);
+                }
+              } else {
+                console.warn('🚨 Tree shadow layer not available for point checking');
+                isShaded = false;
+              }
+            }
+            
+            if (isShaded) hits++;
+            total++;
+          } catch (e) {
+            console.warn('Error reading pixel for path analysis:', e);
+          }
+        }
+      }
+
+      const shadePct = total ? hits / total : 0;
+      
+      // Debug logging for segments with potential shade
+      if (total > 0) {
+        console.log(`📊 Segment ${edge.id}: ${hits}/${total} hits = ${(shadePct * 100).toFixed(1)}% shade`);
+      }
+      
+      pathResults.push({
+        id: edge.id,
+        shadePct,
+        shaded: shadePct >= 0.5,
+        nSamples: total
+      });
     }
 
     // Draw path - either with shade analysis or as simple path
@@ -464,7 +699,7 @@ export default function Map({
         .bindTooltip(`Route: ${pathCoords.length} points`)
         .addTo(pathLayer);
     }
-  }, [ready]);
+  }, [ready, showTreeShadows, showTreeShadowsRef]);
 
   // Unified function to compute and display path with backend API calls
   const computeAndDisplayPath = useCallback(async () => {
@@ -523,13 +758,19 @@ export default function Map({
 
       const pathCoords: [number, number][] = data.path || [];
       
+      // Debug: Log the actual path coordinates returned by backend
+      console.log("🗺️ Backend returned path with", pathCoords.length, "coordinates:");
+      pathCoords.slice(0, 10).forEach((coord, i) => {
+        console.log(`   ${i}: [${coord[0].toFixed(6)}, ${coord[1].toFixed(6)}]`);
+      });
+      
       // Extract route statistics 
       let routeStats = undefined;
       if (data.original_distance_m !== undefined || data.total_distance_m !== undefined) {
         routeStats = {
           originalDistance: data.original_distance_m || data.total_distance_m,
           shadeAwareDistance: data.shade_aware_distance_m || data.total_distance_m,
-          shadePenalty: data.shade_penalty_applied || 1.0,
+          shadePenalty: data.shade_penalty_applied || data.shade_penalty || shadePenalty,
           analysisTime: data.analysis_time || "9:00",
           shadeMode: data.shade_mode || "standard",
           numSegments: data.num_segments || 0,
@@ -549,8 +790,9 @@ export default function Map({
       };
       setPathUIState({ ...pathStateRef.current });
 
-      console.log("✅ Path computed, displaying on map with shade analysis");
-      // Display path with shade analysis
+      console.log("✅ Path computed, displaying on map with unified shade analysis");
+      
+      // Use unified pixel sampling for all shade analysis (building + tree shadows)
       if (pathCoords.length > 0) {
         await displayPathWithShadeAnalysis(pathCoords);
       }
@@ -610,7 +852,14 @@ export default function Map({
 
       // Compute path using backend API
       console.log("🔄 Both points set, calling backend API");
-      await computeAndDisplayPath();
+      console.log("🔄 Current showTreeShadows state before path computation:", showTreeShadows);
+      console.log("🔄 Current showTreeShadows ref before path computation:", showTreeShadowsRef.current);
+      
+      // Add a small delay to ensure state updates are processed
+      setTimeout(async () => {
+        console.log("🔄 Delayed path computation - showTreeShadows ref:", showTreeShadowsRef.current);
+        await computeAndDisplayPath();
+      }, 100);
       
     } else {
       // Reset and start over
@@ -650,7 +899,7 @@ export default function Map({
 
     const map = L.map(mapContainer, {
       zoomControl: true,
-    }).setView([39.9526, -75.1652], 16);
+    }).setView([39.955025, -75.160625], 16); // Centered on tree coverage area
 
     mapRef.current = map;
 
@@ -680,8 +929,11 @@ export default function Map({
     // Add click handler for placing markers (now supports pathfinding)
     map.on('click', handleMapClick);
 
-    // Create shade layer
+    // Test ray-casting algorithm on map ready
     map.whenReady(() => {
+      // Test the ray-casting algorithm
+      testRayCastingAlgorithm();
+      
       setTimeout(() => {
         const shadeDate = new Date();
         shadeDate.setHours(currentHour, 0, 0, 0);
@@ -903,7 +1155,10 @@ export default function Map({
                 type="checkbox"
                 checked={showTreeShadows}
                 onChange={(e) => {
+                  console.log("🌳 Tree shadows toggle changed to:", e.target.checked);
+                  console.log("🌳 Toggle change time:", new Date().toISOString());
                   setShowTreeShadows(e.target.checked);
+                  showTreeShadowsRef.current = e.target.checked; // Update ref immediately
                 }}
               />
               Tree Shadows
@@ -976,7 +1231,12 @@ export default function Map({
           <div style={{ textAlign: 'center', color: '#007cba' }}>⏳ Loading shadows...</div>
         )}
         {ready && !pathUIState.startPoint && (
-          <div style={{ textAlign: 'center', color: '#666' }}>🗺️ Click to set start</div>
+          <div style={{ textAlign: 'center', color: '#666' }}>
+            🗺️ Click to set start<br/>
+            <small style={{ fontSize: '10px', color: '#999' }}>
+              Toggle "Tree Shadows" ON to test geometric detection
+            </small>
+          </div>
         )}
         {ready && pathUIState.startPoint && !pathUIState.endPoint && (
           <div style={{ textAlign: 'center', color: '#666' }}>📍 Click to set destination</div>
