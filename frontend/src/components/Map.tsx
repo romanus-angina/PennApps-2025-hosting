@@ -348,66 +348,22 @@ export default function Map({
       treeShadowLayerRef.current.clearLayers();
       console.log("🌳 Tree shadows hidden");
     }
-  }, [showTreeShadows, loadTreeShadows]);
+  }, [showTreeShadows]); // Remove loadTreeShadows from dependencies to avoid stale closure
 
   // Function to display path with gradient shade analysis
   const displayPathWithShadeAnalysis = useCallback(async (pathCoords: [number, number][]) => {
-    if (!ready || !shadeRef.current || !mapRef.current) return;
-    console.log("hello");
-    // Convert path to edges for analysis
-    const pathEdges: Edge[] = pathCoords.slice(0, -1).map((point, i) => ({
-      id: `path-${i}`,
-      a: { lat: point[0], lng: point[1] },
-      b: { lat: pathCoords[i + 1][0], lng: pathCoords[i + 1][1] }
-    }));
-
-    // Analyze each path segment
+    if (!mapRef.current || !pathLayerRef.current) {
+      console.warn("⚠️ Map or path layer not ready for path display");
+      return;
+    }
+    
+    console.log("🛣️ Displaying path with shade analysis, coords:", pathCoords.length);
+    
     const map = mapRef.current;
     const shade = shadeRef.current;
-    const rect = map.getContainer().getBoundingClientRect();
-    const pathResults: EdgeResult[] = [];
-
-    for (const edge of pathEdges) {
-      const lenM = L.latLng(edge.a).distanceTo(L.latLng(edge.b));
-      const steps = Math.min(Math.max(1, Math.ceil(lenM / 10)), 20);
-      let hits = 0, total = 0;
-
-      for (let j = 0; j <= steps; j++) {
-        const t = steps === 0 ? 0.5 : j / steps;
-        const base = lerp(edge.a, edge.b, t);
-
-        for (let s = 0; s < 3; s++) {
-          const p = jitterMeters(base, 1.5);
-          const cp = map.latLngToContainerPoint([p.lat, p.lng]);
-
-          if (cp.x < 0 || cp.y < 0 || cp.x >= rect.width || cp.y >= rect.height) {
-            continue;
-          }
-
-          const xWin = rect.left + cp.x;
-          const yWin = window.innerHeight - (rect.top + cp.y);
-
-          try {
-            const rgba: Uint8ClampedArray = shade.readPixel(xWin, yWin);
-            if (rgba && isShadowRGBA(rgba, 16)) hits++;
-            total++;
-          } catch (e) {
-            console.warn('Error reading pixel for path analysis:', e);
-          }
-        }
-      }
-
-      const shadePct = total ? hits / total : 0;
-      pathResults.push({
-        id: edge.id,
-        shadePct,
-        shaded: shadePct >= 0.5,
-        nSamples: total
-      });
-    }
-
-    // Display path with gradient colors and preserve markers
-    const pathLayer = pathLayerRef.current!;
+    const pathLayer = pathLayerRef.current;
+    
+    // Always clear existing path content first
     const markers: L.Marker[] = [];
     pathLayer.eachLayer((layer) => {
       if (layer instanceof L.Marker) {
@@ -416,18 +372,96 @@ export default function Map({
     });
     pathLayer.clearLayers();
     markers.forEach(marker => pathLayer.addLayer(marker));
+    
+    // Try shade analysis if shade layer is ready, otherwise just render path
+    let pathResults: EdgeResult[] = [];
+    
+    if (ready && shade) {
+      console.log("🌞 Running shade analysis on path");
+      // Convert path to edges for analysis
+      const pathEdges: Edge[] = pathCoords.slice(0, -1).map((point, i) => ({
+        id: `path-${i}`,
+        a: { lat: point[0], lng: point[1] },
+        b: { lat: pathCoords[i + 1][0], lng: pathCoords[i + 1][1] }
+      }));
 
-    // Draw path segments with gradient colors
-    for (let i = 0; i < pathEdges.length; i++) {
-      const edge = pathEdges[i];
-      const result = pathResults.find(r => r.id === edge.id);
-      const pct = result?.shadePct ?? 0;
+      // Analyze each path segment
+      const rect = map.getContainer().getBoundingClientRect();
 
-      L.polyline(
-        [[edge.a.lat, edge.a.lng], [edge.b.lat, edge.b.lng]],
-        { color: colorForPct(pct), weight: 6, opacity: 0.8 }
-      )
-        .bindTooltip(`Segment ${i + 1}: ${(pct * 100).toFixed(0)}% shaded (${result?.nSamples || 0} samples)`)
+      for (const edge of pathEdges) {
+        const lenM = L.latLng(edge.a).distanceTo(L.latLng(edge.b));
+        const steps = Math.min(Math.max(1, Math.ceil(lenM / 10)), 20);
+        let hits = 0, total = 0;
+
+        for (let j = 0; j <= steps; j++) {
+          const t = steps === 0 ? 0.5 : j / steps;
+          const base = lerp(edge.a, edge.b, t);
+
+          for (let s = 0; s < 3; s++) {
+            const p = jitterMeters(base, 1.5);
+            const cp = map.latLngToContainerPoint([p.lat, p.lng]);
+
+            if (cp.x < 0 || cp.y < 0 || cp.x >= rect.width || cp.y >= rect.height) {
+              continue;
+            }
+
+            const xWin = rect.left + cp.x;
+            const yWin = window.innerHeight - (rect.top + cp.y);
+
+            try {
+              const rgba: Uint8ClampedArray = shade.readPixel(xWin, yWin);
+              if (rgba && isShadowRGBA(rgba, 16)) hits++;
+              total++;
+            } catch (e) {
+              console.warn('Error reading pixel for path analysis:', e);
+            }
+          }
+        }
+
+        const shadePct = total ? hits / total : 0;
+        pathResults.push({
+          id: edge.id,
+          shadePct,
+          shaded: shadePct >= 0.5,
+          nSamples: total
+        });
+      }
+    } else {
+      console.log("⚠️ Shade layer not ready, rendering path without shade analysis");
+    }
+
+    // Draw path - either with shade analysis or as simple path
+    if (pathResults.length > 0) {
+      console.log("🎨 Rendering path with shade gradient colors");
+      // Convert path to edges for analysis
+      const pathEdges: Edge[] = pathCoords.slice(0, -1).map((point, i) => ({
+        id: `path-${i}`,
+        a: { lat: point[0], lng: point[1] },
+        b: { lat: pathCoords[i + 1][0], lng: pathCoords[i + 1][1] }
+      }));
+      
+      // Draw path segments with gradient colors
+      for (let i = 0; i < pathEdges.length; i++) {
+        const edge = pathEdges[i];
+        const result = pathResults.find(r => r.id === edge.id);
+        const pct = result?.shadePct ?? 0;
+
+        L.polyline(
+          [[edge.a.lat, edge.a.lng], [edge.b.lat, edge.b.lng]],
+          { color: colorForPct(pct), weight: 6, opacity: 0.8 }
+        )
+          .bindTooltip(`Segment ${i + 1}: ${(pct * 100).toFixed(0)}% shaded (${result?.nSamples || 0} samples)`)
+          .addTo(pathLayer);
+      }
+    } else {
+      console.log("🛣️ Rendering simple path without shade analysis");
+      // Render simple path line
+      L.polyline(pathCoords, {
+        color: '#007cba',
+        weight: 6,
+        opacity: 0.8
+      })
+        .bindTooltip(`Route: ${pathCoords.length} points`)
         .addTo(pathLayer);
     }
   }, [ready]);
@@ -625,14 +659,23 @@ export default function Map({
       maxZoom: 19,
     }).addTo(map);
 
-    // Create edge layer for shadow classification
+    // Create layers in proper z-order (bottom to top)
+    // 1. Edge layer for shadow classification (bottom)
     edgeLayerRef.current = L.layerGroup().addTo(map);
-
-    // Create path layer for pathfinding
-    pathLayerRef.current = L.layerGroup().addTo(map);
-
-    // Create tree shadow layer for tree shadows
+    
+    // 2. Tree shadow layer (middle - should be below paths)
     treeShadowLayerRef.current = L.layerGroup().addTo(map);
+    
+    // 3. Path layer for pathfinding (top - should be above tree shadows)
+    pathLayerRef.current = L.layerGroup().addTo(map);
+    
+    // Ensure proper z-index ordering
+    if (treeShadowLayerRef.current) {
+      (treeShadowLayerRef.current as any).setZIndex(100);
+    }
+    if (pathLayerRef.current) {
+      (pathLayerRef.current as any).setZIndex(200);
+    }
 
     // Add click handler for placing markers (now supports pathfinding)
     map.on('click', handleMapClick);
