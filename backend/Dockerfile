@@ -25,9 +25,8 @@ COPY . .
 # Create data directory for graph storage
 RUN mkdir -p data
 
-# Expose port
-EXPOSE 8000
+# Expose port (Railway will set this dynamically)
+EXPOSE $PORT
 
-
-# Run the application
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use PORT environment variable (Railway sets this)
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000}"]
