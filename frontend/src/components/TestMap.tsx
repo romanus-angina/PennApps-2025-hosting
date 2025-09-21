@@ -279,7 +279,7 @@ export default function TestMap({
   // Function to display path with gradient shade analysis
   const displayPathWithShadeAnalysis = useCallback(async (pathCoords: [number, number][]) => {
     if (!ready || !shadeRef.current || !mapRef.current) return;
-
+    console.log("hello");
     // Convert path to edges for analysis
     const pathEdges: Edge[] = pathCoords.slice(0, -1).map((point, i) => ({
       id: `path-${i}`,
