@@ -44,6 +44,25 @@ type Pt = { lat: number; lng: number };
 export type Edge = { id: string; a: Pt; b: Pt };
 export type EdgeResult = { id: string; shadePct: number; shaded: boolean; nSamples: number };
 
+function metersToLatDeg(m: number) { return m / 110540; }
+function metersToLngDeg(m: number, lat: number) { return m / (111320 * Math.cos(lat * Math.PI / 180)); }
+function isShadowRGBA(arr: Uint8ClampedArray, alphaThreshold = 16) { return arr[3] >= alphaThreshold; }
+function lerp(a: Pt, b: Pt, t: number): Pt { return { lat: a.lat + (b.lat - a.lat) * t, lng: a.lng + (b.lng - a.lng) * t }; }
+function jitterMeters(p: Pt, r: number): Pt {
+  if (!r) return p;
+  const ang = Math.random() * 2 * Math.PI;
+  const rad = Math.random() * r;
+  const dx = rad * Math.cos(ang), dy = rad * Math.sin(ang);
+  return { lat: p.lat + metersToLatDeg(dy), lng: p.lng + metersToLngDeg(dx, p.lat) };
+}
+function colorForPct(p: number) { 
+  // Gradient from red (0% shade = sunny/hot) to green (100% shade = cool)
+  // 0% shade = red (sunny/hot), 100% shade = green (shaded/cool)
+  const red = Math.round((1 - p) * 255);
+  const green = Math.round(p * 255);
+  return `rgb(${red}, ${green}, 0)`;
+}
+
 interface PathState {
   startPoint: [number, number] | null;
   endPoint: [number, number] | null;
@@ -64,52 +83,28 @@ interface PathState {
   };
 }
 
-function metersToLatDeg(m: number) { return m / 110540; }
-function metersToLngDeg(m: number, lat: number) { return m / (111320 * Math.cos(lat * Math.PI / 180)); }
-function isShadowRGBA(arr: Uint8ClampedArray, alphaThreshold = 16) { return arr[3] >= alphaThreshold; }
-function lerp(a: Pt, b: Pt, t: number): Pt { return { lat: a.lat + (b.lat - a.lat) * t, lng: a.lng + (b.lng - a.lng) * t }; }
-function jitterMeters(p: Pt, r: number): Pt {
-  if (!r) return p;
-  const ang = Math.random() * 2 * Math.PI;
-  const rad = Math.random() * r;
-  const dx = rad * Math.cos(ang), dy = rad * Math.sin(ang);
-  return { lat: p.lat + metersToLatDeg(dy), lng: p.lng + metersToLngDeg(dx, p.lat) };
-}
-function colorForPct(p: number) { 
-  // Gradient from red (0% shade = sunny/hot) to green (100% shade = cool)
-  // 0% shade = red (sunny/hot), 100% shade = green (shaded/cool)
-  const red = Math.round((1 - p) * 255);
-  const green = Math.round(p * 255);
-  return `rgb(${red}, ${green}, 0)`;
-}
-
-export default function ShadeClassifier({
-  edges,
-  date,
+export default function TestMap({
+  edges = [],
+  date = new Date(),
   onResults,
 }: {
-  edges: Edge[];
-  date: Date;
+  edges?: Edge[];
+  date?: Date;
   onResults?: (r: EdgeResult[]) => void;
-}) {
+} = {}) {
   const mapRef = useRef<L.Map | null>(null);
   const shadeRef = useRef<any>(null);
   const edgeLayerRef = useRef<L.LayerGroup | null>(null);
   const pathLayerRef = useRef<L.LayerGroup | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
+  const [testToggle, setTestToggle] = useState(false);
   const [ready, setReady] = useState(false);
-  const [currentHour, setCurrentHour] = useState(9); // Track current hour for display
+  const [currentHour, setCurrentHour] = useState(9);
   const [shadePenalty, setShadePenalty] = useState(1.0); // Shade avoidance factor
   const [useShadeRouting, setUseShadeRouting] = useState(true); // Toggle for shade-aware routing
-  const penaltyUpdateTimeoutRef = useRef<number | null>(null); // Debounce timer
-  const prevShadeRoutingRef = useRef(useShadeRouting); // Track routing mode changes
-  const prevCurrentHourRef = useRef(currentHour); // Track time changes
-  const lastDateRef = useRef<Date>(date);
   const fetchTokenRef = useRef(0);
-  const buildingDataCacheRef = useRef<any[]>([]); // Cache building data
-  const lastBoundsRef = useRef<string>(''); // Track when we need to refetch buildings
-  const shadeOptionsRef = useRef<any>(null); // Cache the shade options to avoid recreating getFeatures
 
-  // Use refs instead of state to avoid re-renders
+  // Use refs instead of state to avoid re-renders for pathfinding
   const pathStateRef = useRef<PathState>({
     startPoint: null,
     endPoint: null,
@@ -129,18 +124,27 @@ export default function ShadeClassifier({
     routeStats: undefined
   });
 
-  // Build ShadeMap options using correct API - cached to avoid rebuilding getFeatures
+  // Refs for reactive recomputation system (this might be the source of lag!)
+  const penaltyUpdateTimeoutRef = useRef<number | null>(null); // Debounce timer
+  const prevShadeRoutingRef = useRef(useShadeRouting); // Track routing mode changes
+  const prevCurrentHourRef = useRef(currentHour); // Track time changes
+  const lastDateRef = useRef(new Date());
+
+  // Building data caching system (final optimization that might cause lag)
+  const buildingDataCacheRef = useRef<any[]>([]); // Cache building data
+  const lastBoundsRef = useRef<string>(''); // Track when we need to refetch buildings
+  const shadeOptionsRef = useRef<any>(null); // Cache the shade options to avoid recreating getFeatures
+
+  // Build ShadeMap options using correct API (with comprehensive caching)
   const buildShadeOptions = (when: Date) => {
-    // If we already have cached options, just update the date and return
+    // Check if we can reuse cached options
     if (shadeOptionsRef.current) {
-      console.log("🔄 Reusing cached shade options, updating date only");
       return {
         ...shadeOptionsRef.current,
-        date: when
+        date: when, // Only update the date
       };
     }
 
-    console.log("🏗️ Creating new shade options with getFeatures function");
     const options = {
       date: when,
       color: "#01112f",
@@ -155,17 +159,11 @@ export default function ShadeClassifier({
         _overzoom: 19,
       },
       getFeatures: async () => {
-        console.log("🏢 getFeatures called");
-        
-        if (!mapRef.current || mapRef.current.getZoom() < 15) {
-          console.log("🏢 Zoom too low, returning empty array");
-          return [];
-        }
+        if (!mapRef.current || mapRef.current.getZoom() < 15) return [];
         
         const my = ++fetchTokenRef.current;
-        console.log("🏢 Fetch token:", my);
-        
         await new Promise((r) => setTimeout(r, 200)); // debounce small pans
+        
         if (my !== fetchTokenRef.current) {
           console.log("🏢 Fetch cancelled due to newer request");
           return [];
@@ -188,7 +186,7 @@ export default function ShadeClassifier({
         }
 
         console.log("🔄 Fetching new building data for bounds:", boundsKey);
-        
+
         const query = `
           [out:json][timeout:25];
           (
@@ -250,19 +248,19 @@ export default function ShadeClassifier({
       opacity: options.opacity,
       apiKey: options.apiKey,
       terrainSource: options.terrainSource,
-      getFeatures: options.getFeatures
+      getFeatures: options.getFeatures,
     };
 
-    return options;
+    return options;;
   };
 
   // Helper to create the ShadeMap layer
   const createShadeLayer = (map: L.Map, when: Date) => {
-    console.log("🌞 Creating shade layer for time:", when);
+    console.log("Creating shade layer for time:", when);
     const layer = (L as any).shadeMap(buildShadeOptions(when));
 
     layer.once("idle", () => {
-      console.log("🌞 Shade layer ready");
+      console.log("Shade layer ready");
       setReady(true);
     });
 
@@ -277,161 +275,6 @@ export default function ShadeClassifier({
       }
     }
   };
-
-  // Unified function to compute and display path with shade analysis
-  const computeAndDisplayPath = useCallback(async () => {
-    if (!pathStateRef.current.startPoint || !pathStateRef.current.endPoint) {
-      return;
-    }
-
-    const startPoint = pathStateRef.current.startPoint;
-    const endPoint = pathStateRef.current.endPoint;
-
-    pathStateRef.current = {
-      ...pathStateRef.current,
-      loading: true,
-      error: null
-    };
-    setPathUIState({ ...pathStateRef.current });
-
-    try {
-      // Always query the appropriate backend endpoint
-      const endpoint = useShadeRouting ? 'shortest_path_shade' : 'shortest_path';
-      const basePayload = {
-        start_lat: startPoint[0],
-        start_lng: startPoint[1],
-        end_lat: endPoint[0],
-        end_lng: endPoint[1]
-      };
-
-      const payload = useShadeRouting ? {
-        ...basePayload,
-        time: currentHour,
-        shade_penalty: shadePenalty
-      } : basePayload;
-
-      const response = await fetch(`http://localhost:8000/${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (data.error) {
-        pathStateRef.current = {
-          ...pathStateRef.current,
-          loading: false,
-          error: data.error
-        };
-        setPathUIState({ ...pathStateRef.current });
-        return;
-      }
-
-      const pathCoords: [number, number][] = data.path || [];
-      
-      // Extract route statistics 
-      let routeStats = undefined;
-      if (data.original_distance_m !== undefined || data.total_distance_m !== undefined) {
-        routeStats = {
-          originalDistance: data.original_distance_m || data.total_distance_m,
-          shadeAwareDistance: data.shade_aware_distance_m || data.total_distance_m,
-          shadePenalty: data.shade_penalty_applied || 1.0,
-          analysisTime: data.analysis_time || "9:00",
-          shadeMode: data.shade_mode || "standard",
-          numSegments: data.num_segments || 0,
-          shadedSegments: data.shaded_segments || 0,
-          shadePercentage: data.shade_percentage || 0,
-          totalShadeLength: data.total_shade_length_m || 0,
-          shadePenaltyAdded: data.shade_penalty_added_m || 0
-        };
-      }
-
-      pathStateRef.current = {
-        ...pathStateRef.current,
-        path: pathCoords,
-        loading: false,
-        error: null,
-        routeStats
-      };
-      setPathUIState({ ...pathStateRef.current });
-
-      // Always perform shade analysis and display with gradient colors
-      if (pathCoords.length > 0 && ready && shadeRef.current) {
-        await displayPathWithShadeAnalysis(pathCoords);
-      }
-
-    } catch (err) {
-      pathStateRef.current = {
-        ...pathStateRef.current,
-        loading: false,
-        error: 'Failed to compute path'
-      };
-      setPathUIState({ ...pathStateRef.current });
-    }
-  }, [useShadeRouting, currentHour, shadePenalty, ready]);
-
-  // Handle map clicks for pathfinding
-  const handleMapClick = useCallback(async (e: L.LeafletMouseEvent) => {
-    if (pathStateRef.current.loading) return;
-
-    const { lat, lng } = e.latlng;
-
-    if (!pathStateRef.current.startPoint) {
-      // Set start point
-      pathStateRef.current = {
-        ...pathStateRef.current,
-        startPoint: [lat, lng],
-        error: null
-      };
-
-      // Update UI state
-      setPathUIState({ ...pathStateRef.current });
-
-      // Add start marker
-      const pathLayer = pathLayerRef.current!;
-      L.marker([lat, lng], { icon: startIcon }).addTo(pathLayer);
-    } else if (!pathStateRef.current.endPoint) {
-      // Set end point
-      pathStateRef.current = {
-        ...pathStateRef.current,
-        endPoint: [lat, lng],
-        loading: false, // Will be set to true in computeAndDisplayPath
-        error: null
-      };
-
-      // Update UI state
-      setPathUIState({ ...pathStateRef.current });
-
-      // Add end marker
-      const pathLayer = pathLayerRef.current!;
-      L.marker([lat, lng], { icon: endIcon }).addTo(pathLayer);
-
-      // Compute path using unified function
-      await computeAndDisplayPath();
-    } else {
-      // Reset and start over
-      const pathLayer = pathLayerRef.current!;
-      pathLayer.clearLayers();
-
-      pathStateRef.current = {
-        startPoint: [lat, lng],
-        endPoint: null,
-        path: [],
-        loading: false,
-        error: null,
-        routeStats: undefined
-      };
-
-      // Update UI state
-      setPathUIState({ ...pathStateRef.current });
-
-      // Add new start marker
-      L.marker([lat, lng], { icon: startIcon }).addTo(pathLayer);
-    }
-  }, [computeAndDisplayPath]);
 
   // Function to display path with gradient shade analysis
   const displayPathWithShadeAnalysis = useCallback(async (pathCoords: [number, number][]) => {
@@ -515,9 +358,186 @@ export default function ShadeClassifier({
     }
   }, [ready]);
 
+  // Unified function to compute and display path with backend API calls
+  const computeAndDisplayPath = useCallback(async () => {
+    if (!pathStateRef.current.startPoint || !pathStateRef.current.endPoint) {
+      return;
+    }
+
+    const startPoint = pathStateRef.current.startPoint;
+    const endPoint = pathStateRef.current.endPoint;
+
+    console.log("🚀 Computing path from backend API");
+    pathStateRef.current = {
+      ...pathStateRef.current,
+      loading: true,
+      error: null
+    };
+    setPathUIState({ ...pathStateRef.current });
+
+    try {
+      // Choose endpoint based on routing mode
+      const endpoint = useShadeRouting ? 'shortest_path_shade' : 'shortest_path';
+      const basePayload = {
+        start_lat: startPoint[0],
+        start_lng: startPoint[1],
+        end_lat: endPoint[0],
+        end_lng: endPoint[1]
+      };
+
+      const payload = useShadeRouting ? {
+        ...basePayload,
+        time: currentHour,
+        shade_penalty: shadePenalty
+      } : basePayload;
+
+      console.log("📡 Calling backend API:", endpoint, payload);
+      const response = await fetch(`http://localhost:8000/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      console.log("📥 Backend response:", data);
+
+      if (data.error) {
+        pathStateRef.current = {
+          ...pathStateRef.current,
+          loading: false,
+          error: data.error
+        };
+        setPathUIState({ ...pathStateRef.current });
+        return;
+      }
+
+      const pathCoords: [number, number][] = data.path || [];
+      
+      // Extract route statistics 
+      let routeStats = undefined;
+      if (data.original_distance_m !== undefined || data.total_distance_m !== undefined) {
+        routeStats = {
+          originalDistance: data.original_distance_m || data.total_distance_m,
+          shadeAwareDistance: data.shade_aware_distance_m || data.total_distance_m,
+          shadePenalty: data.shade_penalty_applied || 1.0,
+          analysisTime: data.analysis_time || "9:00",
+          shadeMode: data.shade_mode || "standard",
+          numSegments: data.num_segments || 0,
+          shadedSegments: data.shaded_segments || 0,
+          shadePercentage: data.shade_percentage || 0,
+          totalShadeLength: data.total_shade_length_m || 0,
+          shadePenaltyAdded: data.shade_penalty_added_m || 0
+        };
+      }
+
+      pathStateRef.current = {
+        ...pathStateRef.current,
+        path: pathCoords,
+        loading: false,
+        error: null,
+        routeStats
+      };
+      setPathUIState({ ...pathStateRef.current });
+
+      console.log("✅ Path computed, displaying on map with shade analysis");
+      // Display path with shade analysis
+      if (pathCoords.length > 0) {
+        await displayPathWithShadeAnalysis(pathCoords);
+      }
+
+    } catch (err) {
+      console.error("❌ Backend API error:", err);
+      pathStateRef.current = {
+        ...pathStateRef.current,
+        loading: false,
+        error: 'Failed to compute path'
+      };
+      setPathUIState({ ...pathStateRef.current });
+    }
+  }, [useShadeRouting, currentHour, shadePenalty, displayPathWithShadeAnalysis]);
+
+  // Handle map clicks for pathfinding (basic version without backend)
+  const handleMapClick = useCallback(async (e: L.LeafletMouseEvent) => {
+    if (pathStateRef.current.loading) return;
+
+    const { lat, lng } = e.latlng;
+    console.log("Map clicked for pathfinding at:", lat, lng);
+
+    if (!pathStateRef.current.startPoint) {
+      // Set start point
+      console.log("Setting start point");
+      pathStateRef.current = {
+        ...pathStateRef.current,
+        startPoint: [lat, lng],
+        error: null
+      };
+
+      // Update UI state
+      setPathUIState({ ...pathStateRef.current });
+
+      // Add start marker with custom icon to path layer
+      const pathLayer = pathLayerRef.current!;
+      const marker = L.marker([lat, lng], { icon: startIcon }).addTo(pathLayer);
+      marker.bindPopup("Start Point");
+      markersRef.current.push(marker);
+      
+    } else if (!pathStateRef.current.endPoint) {
+      // Set end point
+      console.log("Setting end point");
+      pathStateRef.current = {
+        ...pathStateRef.current,
+        endPoint: [lat, lng],
+        error: null
+      };
+
+      // Update UI state
+      setPathUIState({ ...pathStateRef.current });
+
+      // Add end marker with custom icon to path layer
+      const pathLayer = pathLayerRef.current!;
+      const marker = L.marker([lat, lng], { icon: endIcon }).addTo(pathLayer);
+      marker.bindPopup("End Point");
+      markersRef.current.push(marker);
+
+      // Compute path using backend API
+      console.log("🔄 Both points set, calling backend API");
+      await computeAndDisplayPath();
+      
+    } else {
+      // Reset and start over
+      console.log("Resetting pathfinding");
+      
+      // Clear path layer (which includes all pathfinding markers)
+      const pathLayer = pathLayerRef.current!;
+      pathLayer.clearLayers();
+      markersRef.current = [];
+
+      pathStateRef.current = {
+        startPoint: [lat, lng],
+        endPoint: null,
+        path: [],
+        loading: false,
+        error: null,
+        routeStats: undefined
+      };
+
+      // Update UI state
+      setPathUIState({ ...pathStateRef.current });
+
+      // Add new start marker with custom icon to path layer
+      const marker = L.marker([lat, lng], { icon: startIcon }).addTo(pathLayer);
+      marker.bindPopup("Start Point");
+      markersRef.current.push(marker);
+    }
+  }, []);
+
   useEffect(() => {
+    console.log("TestMap useEffect triggered - Map setup");
+    
     // Map setup
-    const mapContainer = document.getElementById("map");
+    const mapContainer = document.getElementById("test-map");
     if (!mapContainer) return;
 
     const map = L.map(mapContainer, {
@@ -525,7 +545,6 @@ export default function ShadeClassifier({
     }).setView([39.9526, -75.1652], 16);
 
     mapRef.current = map;
-    lastDateRef.current = date;
 
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OSM",
@@ -538,44 +557,24 @@ export default function ShadeClassifier({
     // Create path layer for pathfinding
     pathLayerRef.current = L.layerGroup().addTo(map);
 
-    // Add click handler for pathfinding
+    // Add click handler for placing markers (now supports pathfinding)
     map.on('click', handleMapClick);
-
-    // Legend
-    const legend: any = (L as any).control({ position: "bottomleft" });
-    legend.onAdd = () => {
-      const div = L.DomUtil.create("div", "legend");
-      div.innerHTML = `
-        <div style="padding:8px;background:#0008;color:#fff;border-radius:8px;font:14px system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
-          <div><span style="color:#1a7f37">■■</span> shaded (cool)</div>
-          <div><span style="color:#c62828">■■</span> sunny (hot)</div>
-        </div>`;
-      return div;
-    };
-    legend.addTo(map);
 
     // Create shade layer
     map.whenReady(() => {
       setTimeout(() => {
         const shadeDate = new Date();
         shadeDate.setHours(currentHour, 0, 0, 0);
-        lastDateRef.current = shadeDate;
         createShadeLayer(map, shadeDate);
       }, 100);
     });
 
     return () => {
-      // Clean up debounce timeout
-      if (penaltyUpdateTimeoutRef.current) {
-        clearTimeout(penaltyUpdateTimeoutRef.current);
-      }
-      
-      // Clear building cache
-      buildingDataCacheRef.current = [];
-      lastBoundsRef.current = '';
-      shadeOptionsRef.current = null;
+      console.log("TestMap cleanup - removing map");
       
       map.off('click', handleMapClick);
+      
+      // Clear layers
       if (edgeLayerRef.current) {
         try {
           map.removeLayer(edgeLayerRef.current);
@@ -590,6 +589,18 @@ export default function ShadeClassifier({
           console.warn('Error removing path layer:', e);
         }
       }
+      
+      // Clear markers
+      markersRef.current.forEach(marker => {
+        try {
+          map.removeLayer(marker);
+        } catch (e) {
+          console.warn('Error removing marker:', e);
+        }
+      });
+      markersRef.current = [];
+      
+      // Remove shade layer
       if (shadeRef.current) {
         try {
           map.removeLayer(shadeRef.current);
@@ -597,41 +608,41 @@ export default function ShadeClassifier({
           console.warn('Error removing shade layer:', e);
         }
       }
+      
+      // Clear all caches (building data caching cleanup)
+      buildingDataCacheRef.current = [];
+      lastBoundsRef.current = '';
+      shadeOptionsRef.current = null;
+      console.log("🗑️ Cleared all building data and shade option caches");
+      
+      // Remove map
       map.remove();
     };
-  }, [handleMapClick]);
-
-  // Update date (but preserve currentHour setting)
-  useEffect(() => {
-    if (shadeRef.current?.setDate) {
-      setReady(false);
-      const newDate = new Date(date);
-      newDate.setHours(currentHour, 0, 0, 0);
-      lastDateRef.current = newDate;
-      shadeRef.current.setDate(newDate);
-      shadeRef.current.once("idle", () => setReady(true));
-    }
-  }, [date]);
+  }, [handleMapClick]); // Include handleMapClick in dependencies
 
   // Update shade time when hour changes
   useEffect(() => {
-    console.log("⏰ Hour changed useEffect triggered. New hour:", currentHour);
+    console.log("TestMap useEffect triggered - Hour changed:", currentHour);
     if (shadeRef.current?.setDate) {
-      console.log("⏰ Updating shade layer time to:", currentHour);
       setReady(false);
-      const newDate = new Date(lastDateRef.current);
+      const newDate = new Date();
       newDate.setHours(currentHour, 0, 0, 0);
-      lastDateRef.current = newDate;
       shadeRef.current.setDate(newDate);
       shadeRef.current.once("idle", () => {
-        console.log("⏰ Shade layer time update complete for hour:", currentHour);
+        console.log("Shade layer updated for hour:", currentHour);
         setReady(true);
       });
     }
   }, [currentHour]);
 
-  // Reactive recomputation when shade settings change
+  // Separate useEffect for toggle changes to see if this causes refresh
   useEffect(() => {
+    console.log("TestMap useEffect triggered - Toggle changed:", testToggle);
+  }, [testToggle]);
+
+  // Reactive recomputation when shade settings change (SUSPECTED LAG SOURCE!)
+  useEffect(() => {
+    console.log("🔄 Reactive recomputation useEffect triggered");
     if (pathStateRef.current.startPoint && pathStateRef.current.endPoint) {
       // Debounce the recomputation to avoid rapid API calls
       if (penaltyUpdateTimeoutRef.current) {
@@ -642,6 +653,8 @@ export default function ShadeClassifier({
       const shadeRoutingChanged = prevShadeRoutingRef.current !== useShadeRouting;
       const timeChanged = prevCurrentHourRef.current !== currentHour;
       
+      console.log("🔄 Change detection:", { shadeRoutingChanged, timeChanged });
+      
       prevShadeRoutingRef.current = useShadeRouting;
       prevCurrentHourRef.current = currentHour;
       
@@ -649,7 +662,9 @@ export default function ShadeClassifier({
       // shorter delay for penalty adjustments
       const delay = (shadeRoutingChanged || timeChanged) ? 800 : 150;
       
+      console.log("🔄 Setting recomputation timer with delay:", delay + "ms");
       penaltyUpdateTimeoutRef.current = window.setTimeout(() => {
+        console.log("🔄 Executing debounced recomputation");
         computeAndDisplayPath();
       }, delay);
     }
@@ -757,7 +772,7 @@ export default function ShadeClassifier({
 
   return (
     <div style={{ height: "100%", position: "relative" }}>
-      <div id="map" style={{ height: "100%" }} />
+      <div id="test-map" style={{ height: "100%" }} />
 
       {/* Settings Panel - Top Right */}
       <div style={{
@@ -917,11 +932,11 @@ export default function ShadeClassifier({
         )}
       </div>
 
-      {/* Legend - Bottom Left */}
+      {/* Legend - Bottom Right */}
       <div style={{
         position: 'absolute',
         bottom: 20,
-        left: 20,
+        right: 20,
         background: 'rgba(255,255,255,0.92)',
         padding: '12px',
         borderRadius: '8px',
@@ -965,14 +980,17 @@ export default function ShadeClassifier({
         </div>
       </div>
 
-      <style>{`
-        .info-panel:hover .compact-info {
-          display: none !important;
-        }
-        .info-panel:hover .expanded-info {
-          display: block !important;
-        }
-      `}</style>
+      {/* Style for hover effects - using global CSS */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .info-panel:hover .compact-info {
+            display: none;
+          }
+          .info-panel:hover .expanded-info {
+            display: block !important;
+          }
+        `
+      }} />
     </div>
   );
 }

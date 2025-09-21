@@ -1,19 +1,28 @@
 import ShadeClassifier, { Edge } from "./components/Map";
 import EdgeAnalysis from "./components/EdgeAnalysis";
+import TestMap from "./components/TestMap";
 import { useMemo, useState, useEffect } from "react";
 
 export default function App() {
   const [date] = useState(() => new Date());
   const edges = useMemo(() => [], []); // No demo edges needed
-  const [currentPage, setCurrentPage] = useState<'map' | 'analysis'>(() => {
+  const [currentPage, setCurrentPage] = useState<'map' | 'analysis' | 'test'>(() => {
     // Check URL path to determine initial page
-    return window.location.pathname === '/analysis' ? 'analysis' : 'map';
+    if (window.location.pathname === '/analysis') return 'analysis';
+    if (window.location.pathname === '/test') return 'test';
+    return 'map';
   });
 
   // Handle URL changes
   useEffect(() => {
     const handlePopState = () => {
-      setCurrentPage(window.location.pathname === '/analysis' ? 'analysis' : 'map');
+      if (window.location.pathname === '/analysis') {
+        setCurrentPage('analysis');
+      } else if (window.location.pathname === '/test') {
+        setCurrentPage('test');
+      } else {
+        setCurrentPage('map');
+      }
     };
     
     window.addEventListener('popstate', handlePopState);
@@ -21,14 +30,23 @@ export default function App() {
   }, []);
 
   // Update URL when page changes
-  const navigateToPage = (page: 'map' | 'analysis') => {
-    const newPath = page === 'analysis' ? '/analysis' : '/';
+  const navigateToPage = (page: 'map' | 'analysis' | 'test') => {
+    const pathMap = {
+      'map': '/',
+      'analysis': '/analysis',
+      'test': '/test'
+    };
+    const newPath = pathMap[page];
     window.history.pushState({}, '', newPath);
     setCurrentPage(page);
   };
 
   if (currentPage === 'analysis') {
     return <EdgeAnalysis onBack={() => navigateToPage('map')} />;
+  }
+
+  if (currentPage === 'test') {
+    return <TestMap />;
   }
 
   return (
