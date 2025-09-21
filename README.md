@@ -1,6 +1,13 @@
-# PennApps-2025: 
+# PennApps 2025: ShadeNav
 
-A comprehensive route-planning system for downtown Philadelphia that optimizes paths based on shade coverage and essential services. This system uses advanced satellite imagery analysis and OpenStreetMap data to provide intelligent routing recommendations.
+Climate change has created a devastating feedback loop: rising temperatures make walking unbearable, forcing people to drive more, pumping more greenhouse gases into the atmosphere, making cities even hotter.
+
+**ShadeNav breaks this cycle** by making walking comfortable again through intelligent shade-optimized routing. Using satellite analysis and real-time sun positioning, we find paths that maximize shade coverage - because shaded areas feel up to 20°F cooler than direct sunlight.
+
+A comprehensive route-planning system for downtown Philadelphia that optimizes paths based on shade coverage and essential services using advanced satellite imagery analysis and OpenStreetMap data.
+
+See: https://devpost.com/software/shadenav
+
 
 ## Project Structure
 
@@ -9,25 +16,32 @@ A comprehensive route-planning system for downtown Philadelphia that optimizes p
 
 ## Features
 
-### Advanced Tree Detection
-- **Satellite Analysis**: Real-time vegetation detection using Google Earth Engine
-  - **NDVI**: Normalized Difference Vegetation Index (vegetation health)
-  - **NDWI**: Normalized Difference Water Index (water content)  
-  - **GNDVI**: Green Normalized Difference Vegetation Index (green vegetation)
-- **Multi-strategy Combination**: Weighted combination of satellite and OpenStreetMap data
-- **Density Scoring**: Trees scored based on vegetation density and confidence
-- **Ultra-fine Grid**: 5m resolution analysis for precise tree detection
+### Interactive Map of Downtown Philadelphia
+- **High-Resolution Urban Mapping**: Street-level visualization with building footprints and infrastructure
+- **Real-time Interface**: Interactive Leaflet map with dynamic route rendering and gradient shade analysis
+- **OpenStreetMap Integration**: Comprehensive road networks and urban data foundation
 
-### Waypoint Pathfinding
-- **Water Fountains**: `amenity=drinking_water` locations
-- **Stores**: `shop=convenience|supermarket|grocery|beverages` locations
-- **Essential Services**: Optimized routing for hydration and supplies
+### Advanced Shadow Simulation System
+- **Building Height Analysis**: Precise height extraction from OpenStreetMap and satellite data
+- **Solar Ray Tracing**: Computational geometry for sun ray simulation at any time/date
+- **Dynamic Shadow Mapping**: Real-time calculations using sun position, building geometry, and seasonal variations
+- **Multi-Source Shade Detection**: Combines building shadows with tree canopy coverage
+- **Temporal Prediction**: Forecasts shade patterns throughout the day
 
-### Interactive Visualizations
-- **Tree Maps**: Interactive HTML maps with density-based color coding
-- **Waypoint Maps**: Visual representation of essential services
-- **Real-time Analysis**: Live satellite data processing
-- **Real-time Shade Maps**: Visualizes shade depending on angle of the sun at a given time of day
+### Intelligent Pathfinding Algorithms
+- **Dijkstra's & A* Search**: Shortest path computation with shade-weighted edge costs and heuristic optimization
+- **Custom Shade Metrics**: Edge weights incorporating shade coverage, temperature differentials, and comfort indices
+- **Multi-Objective Optimization**: Balances route efficiency with shade maximization
+- **Dynamic Re-routing**: Real-time path adaptation based on sun position changes
+
+### Tree Detection & Environmental Analysis
+- **Satellite Analysis**: Google Earth Engine vegetation detection (NDVI, NDWI, GNDVI indices)
+- **Multi-Strategy Fusion**: Weighted combination of satellite and OpenStreetMap data
+- **Ultra-Fine Resolution**: 5m grid analysis with density scoring for precise tree detection
+
+### Smart Waypoint Integration
+- **Essential Services**: Water fountains, convenience stores, and climate-controlled spaces
+- **Adaptive Selection**: Dynamic waypoint adjustment based on route length and weather conditions
 
 ## Quickstart
 
@@ -128,12 +142,40 @@ for tree in trees:
     source = tree['source']
 ```
 
-## Notes & Next Steps
+## Development Process
 
-- The frontend includes a placeholder for `leaflet-shadow-simulator` usage; import and initialize it in `src/components/Map.tsx` when ready.
-- The backend's LLM endpoint is a simple rule-based stub in `backend/llm_stub.py` used by `/llm/weights`.
-- The system includes comprehensive fallback mechanisms for when satellite data is unavailable.
-- All detection algorithms include detailed logging and error handling.
+### Developing the graph
+![Visualization of roads in downtown Philadelphia](figs/philly_roads.png)
+
+Initial street network extraction from OpenStreetMap showing downtown Philadelphia's road infrastructure. This visualization demonstrates the comprehensive coverage of walkable paths that form the foundation of our routing graph.
+
+### Processing edge shadow data
+![Generating shadow profiling for edges in graph](figs/hackathon2.png)
+
+Shadow analysis pipeline in action, processing individual street segments (edges) to calculate shade coverage. The visualization shows the computational process of analyzing building heights and sun angles to determine shadow patterns for each walkable path.
+
+### Profiling edges at different times of day
+![Morning shadow analysis](figs/hackathon3.png) ![Midday shadow coverage](figs/hackathon4.png) ![Afternoon shade patterns](figs/hackathon5.png) ![Evening shadow distribution](figs/hackathon6.png)
+
+Temporal shadow analysis across different hours of the day, demonstrating how shade patterns shift as the sun moves. Each visualization captures shadow distribution at key times (morning, midday, afternoon, evening), showing the dynamic nature of urban shade coverage that drives our intelligent routing decisions.
+
+## Future Work
+
+### Core Enhancements
+- **Crime & Safety Integration**: Balance shade optimization with real-time safety data
+- **Accessibility Features**: ADA-compliant routing with wheelchair accessibility
+- **Emergency Shelter Network**: Integration with cooling centers for extreme heat events
+
+### Urban Planning Analytics
+- **Optimal Shelter Placement**: AI-driven analysis to identify strategic locations for new shade structures that maximize citywide walking comfort
+- **Heat Island Mitigation**: Data-driven recommendations for tree planting and infrastructure modifications to reduce urban heat effects
+- **Pedestrian Flow Analysis**: Integration with foot traffic data to prioritize shade improvements in high-usage corridors
+- **Cost-Benefit Optimization**: ROI analysis for shade infrastructure investments based on pedestrian comfort gains
+
+### Advanced Technologies
+- **IoT Sensor Integration**: Real-time temperature and air quality data from city sensors
+- **Machine Learning Personalization**: User-specific heat tolerance and comfort preferences
+- **Municipal Planning Tools**: City dashboard for pedestrian comfort analytics
 
 ## Dependencies
 
