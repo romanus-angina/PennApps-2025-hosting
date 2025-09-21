@@ -163,8 +163,8 @@ export default function EdgeAnalysis({ onBack }: { onBack?: () => void }) {
     setLoadingEdges(true);
     try {
       const url = edgeLimit > 0 
-        ? `http://localhost:8000/graph/edges?limit=${edgeLimit}`
-        : 'http://localhost:8000/graph/edges';
+        ? `https://pennapps-2025-hosting-production.up.railway.app/graph/edges?limit=${edgeLimit}`
+        : 'https://pennapps-2025-hosting-production.up.railway.app/graph/edges';
       
       console.log(`Loading edges from: ${url}`);
       const response = await fetch(url);

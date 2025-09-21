@@ -458,7 +458,7 @@ export default function Map({
 
     try {
       console.log("🌳 Loading tree shadows from backend...");
-      const response = await fetch('http://localhost:8000/tree_shadows');
+      const response = await fetch('https://pennapps-2025-hosting-production.up.railway.app/tree_shadows');
       const data = await response.json();
 
       if (data.error) {
@@ -773,7 +773,7 @@ export default function Map({
       } : basePayload;
 
       console.log("📡 Calling backend API:", endpoint, payload);
-      const response = await fetch(`http://localhost:8000/${endpoint}`, {
+      const response = await fetch(`https://pennapps-2025-hosting-production.up.railway.app/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
