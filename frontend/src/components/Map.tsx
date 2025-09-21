@@ -50,6 +50,18 @@ interface PathState {
   path: [number, number][];
   loading: boolean;
   error: string | null;
+  routeStats?: {
+    originalDistance: number;
+    shadeAwareDistance: number;
+    shadePenalty: number;
+    analysisTime: string;
+    shadeMode: string;
+    numSegments: number;
+    shadedSegments: number;
+    shadePercentage: number;
+    totalShadeLength: number;
+    shadePenaltyAdded: number;
+  };
 }
 
 function metersToLatDeg(m: number) { return m / 110540; }
@@ -63,7 +75,13 @@ function jitterMeters(p: Pt, r: number): Pt {
   const dx = rad * Math.cos(ang), dy = rad * Math.sin(ang);
   return { lat: p.lat + metersToLatDeg(dy), lng: p.lng + metersToLngDeg(dx, p.lat) };
 }
-function colorForPct(p: number) { return p >= 0.5 ? "#1a7f37" : "#c62828"; }
+function colorForPct(p: number) { 
+  // Gradient from red (0% shade = sunny/hot) to green (100% shade = cool)
+  // 0% shade = red (sunny/hot), 100% shade = green (shaded/cool)
+  const red = Math.round((1 - p) * 255);
+  const green = Math.round(p * 255);
+  return `rgb(${red}, ${green}, 0)`;
+}
 
 export default function ShadeClassifier({
   edges,
@@ -79,6 +97,12 @@ export default function ShadeClassifier({
   const edgeLayerRef = useRef<L.LayerGroup | null>(null);
   const pathLayerRef = useRef<L.LayerGroup | null>(null);
   const [ready, setReady] = useState(false);
+  const [currentHour, setCurrentHour] = useState(9); // Track current hour for display
+  const [shadePenalty, setShadePenalty] = useState(1.0); // Shade avoidance factor
+  const [useShadeRouting, setUseShadeRouting] = useState(true); // Toggle for shade-aware routing
+  const penaltyUpdateTimeoutRef = useRef<number | null>(null); // Debounce timer
+  const prevShadeRoutingRef = useRef(useShadeRouting); // Track routing mode changes
+  const prevCurrentHourRef = useRef(currentHour); // Track time changes
   const lastDateRef = useRef<Date>(date);
   const fetchTokenRef = useRef(0);
 
@@ -88,7 +112,8 @@ export default function ShadeClassifier({
     endPoint: null,
     path: [],
     loading: false,
-    error: null
+    error: null,
+    routeStats: undefined
   });
 
   // State only for UI updates
@@ -97,7 +122,8 @@ export default function ShadeClassifier({
     endPoint: null,
     path: [],
     loading: false,
-    error: null
+    error: null,
+    routeStats: undefined
   });
 
   // Build ShadeMap options using correct API
@@ -185,6 +211,101 @@ export default function ShadeClassifier({
     }
   };
 
+  // Unified function to compute and display path with shade analysis
+  const computeAndDisplayPath = useCallback(async () => {
+    if (!pathStateRef.current.startPoint || !pathStateRef.current.endPoint) {
+      return;
+    }
+
+    const startPoint = pathStateRef.current.startPoint;
+    const endPoint = pathStateRef.current.endPoint;
+
+    pathStateRef.current = {
+      ...pathStateRef.current,
+      loading: true,
+      error: null
+    };
+    setPathUIState({ ...pathStateRef.current });
+
+    try {
+      // Always query the appropriate backend endpoint
+      const endpoint = useShadeRouting ? 'shortest_path_shade' : 'shortest_path';
+      const basePayload = {
+        start_lat: startPoint[0],
+        start_lng: startPoint[1],
+        end_lat: endPoint[0],
+        end_lng: endPoint[1]
+      };
+
+      const payload = useShadeRouting ? {
+        ...basePayload,
+        time: currentHour,
+        shade_penalty: shadePenalty
+      } : basePayload;
+
+      const response = await fetch(`http://localhost:8000/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        pathStateRef.current = {
+          ...pathStateRef.current,
+          loading: false,
+          error: data.error
+        };
+        setPathUIState({ ...pathStateRef.current });
+        return;
+      }
+
+      const pathCoords: [number, number][] = data.path || [];
+      
+      // Extract route statistics 
+      let routeStats = undefined;
+      if (data.original_distance_m !== undefined || data.total_distance_m !== undefined) {
+        routeStats = {
+          originalDistance: data.original_distance_m || data.total_distance_m,
+          shadeAwareDistance: data.shade_aware_distance_m || data.total_distance_m,
+          shadePenalty: data.shade_penalty_applied || 1.0,
+          analysisTime: data.analysis_time || "9:00",
+          shadeMode: data.shade_mode || "standard",
+          numSegments: data.num_segments || 0,
+          shadedSegments: data.shaded_segments || 0,
+          shadePercentage: data.shade_percentage || 0,
+          totalShadeLength: data.total_shade_length_m || 0,
+          shadePenaltyAdded: data.shade_penalty_added_m || 0
+        };
+      }
+
+      pathStateRef.current = {
+        ...pathStateRef.current,
+        path: pathCoords,
+        loading: false,
+        error: null,
+        routeStats
+      };
+      setPathUIState({ ...pathStateRef.current });
+
+      // Always perform shade analysis and display with gradient colors
+      if (pathCoords.length > 0 && ready && shadeRef.current) {
+        await displayPathWithShadeAnalysis(pathCoords);
+      }
+
+    } catch (err) {
+      pathStateRef.current = {
+        ...pathStateRef.current,
+        loading: false,
+        error: 'Failed to compute path'
+      };
+      setPathUIState({ ...pathStateRef.current });
+    }
+  }, [useShadeRouting, currentHour, shadePenalty, ready]);
+
   // Handle map clicks for pathfinding
   const handleMapClick = useCallback(async (e: L.LeafletMouseEvent) => {
     if (pathStateRef.current.loading) return;
@@ -206,11 +327,11 @@ export default function ShadeClassifier({
       const pathLayer = pathLayerRef.current!;
       L.marker([lat, lng], { icon: startIcon }).addTo(pathLayer);
     } else if (!pathStateRef.current.endPoint) {
-      // Set end point and compute path
+      // Set end point
       pathStateRef.current = {
         ...pathStateRef.current,
         endPoint: [lat, lng],
-        loading: true,
+        loading: false, // Will be set to true in computeAndDisplayPath
         error: null
       };
 
@@ -221,56 +342,8 @@ export default function ShadeClassifier({
       const pathLayer = pathLayerRef.current!;
       L.marker([lat, lng], { icon: endIcon }).addTo(pathLayer);
 
-      try {
-        const response = await fetch('http://localhost:8000/shortest_path', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            start_lat: pathStateRef.current.startPoint![0],
-            start_lng: pathStateRef.current.startPoint![1],
-            end_lat: lat,
-            end_lng: lng
-          })
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-          pathStateRef.current = {
-            ...pathStateRef.current,
-            loading: false,
-            error: data.error
-          };
-        } else {
-          const pathCoords: [number, number][] = data.path || [];
-          pathStateRef.current = {
-            ...pathStateRef.current,
-            path: pathCoords,
-            loading: false,
-            error: null
-          };
-
-          // Add path polyline
-          if (pathCoords.length > 0) {
-            L.polyline(pathCoords, {
-              color: "blue",
-              weight: 4,
-              opacity: 0.7
-            }).addTo(pathLayer);
-          }
-        }
-      } catch (err) {
-        pathStateRef.current = {
-          ...pathStateRef.current,
-          loading: false,
-          error: 'Failed to compute path'
-        };
-      }
-
-      // Update UI state after API call
-      setPathUIState({ ...pathStateRef.current });
+      // Compute path using unified function
+      await computeAndDisplayPath();
     } else {
       // Reset and start over
       const pathLayer = pathLayerRef.current!;
@@ -281,7 +354,8 @@ export default function ShadeClassifier({
         endPoint: null,
         path: [],
         loading: false,
-        error: null
+        error: null,
+        routeStats: undefined
       };
 
       // Update UI state
@@ -290,7 +364,89 @@ export default function ShadeClassifier({
       // Add new start marker
       L.marker([lat, lng], { icon: startIcon }).addTo(pathLayer);
     }
-  }, []);
+  }, [computeAndDisplayPath]);
+
+  // Function to display path with gradient shade analysis
+  const displayPathWithShadeAnalysis = useCallback(async (pathCoords: [number, number][]) => {
+    if (!ready || !shadeRef.current || !mapRef.current) return;
+
+    // Convert path to edges for analysis
+    const pathEdges: Edge[] = pathCoords.slice(0, -1).map((point, i) => ({
+      id: `path-${i}`,
+      a: { lat: point[0], lng: point[1] },
+      b: { lat: pathCoords[i + 1][0], lng: pathCoords[i + 1][1] }
+    }));
+
+    // Analyze each path segment
+    const map = mapRef.current;
+    const shade = shadeRef.current;
+    const rect = map.getContainer().getBoundingClientRect();
+    const pathResults: EdgeResult[] = [];
+
+    for (const edge of pathEdges) {
+      const lenM = L.latLng(edge.a).distanceTo(L.latLng(edge.b));
+      const steps = Math.min(Math.max(1, Math.ceil(lenM / 10)), 20);
+      let hits = 0, total = 0;
+
+      for (let j = 0; j <= steps; j++) {
+        const t = steps === 0 ? 0.5 : j / steps;
+        const base = lerp(edge.a, edge.b, t);
+
+        for (let s = 0; s < 3; s++) {
+          const p = jitterMeters(base, 1.5);
+          const cp = map.latLngToContainerPoint([p.lat, p.lng]);
+
+          if (cp.x < 0 || cp.y < 0 || cp.x >= rect.width || cp.y >= rect.height) {
+            continue;
+          }
+
+          const xWin = rect.left + cp.x;
+          const yWin = window.innerHeight - (rect.top + cp.y);
+
+          try {
+            const rgba: Uint8ClampedArray = shade.readPixel(xWin, yWin);
+            if (rgba && isShadowRGBA(rgba, 16)) hits++;
+            total++;
+          } catch (e) {
+            console.warn('Error reading pixel for path analysis:', e);
+          }
+        }
+      }
+
+      const shadePct = total ? hits / total : 0;
+      pathResults.push({
+        id: edge.id,
+        shadePct,
+        shaded: shadePct >= 0.5,
+        nSamples: total
+      });
+    }
+
+    // Display path with gradient colors and preserve markers
+    const pathLayer = pathLayerRef.current!;
+    const markers: L.Marker[] = [];
+    pathLayer.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        markers.push(layer);
+      }
+    });
+    pathLayer.clearLayers();
+    markers.forEach(marker => pathLayer.addLayer(marker));
+
+    // Draw path segments with gradient colors
+    for (let i = 0; i < pathEdges.length; i++) {
+      const edge = pathEdges[i];
+      const result = pathResults.find(r => r.id === edge.id);
+      const pct = result?.shadePct ?? 0;
+
+      L.polyline(
+        [[edge.a.lat, edge.a.lng], [edge.b.lat, edge.b.lng]],
+        { color: colorForPct(pct), weight: 6, opacity: 0.8 }
+      )
+        .bindTooltip(`Segment ${i + 1}: ${(pct * 100).toFixed(0)}% shaded (${result?.nSamples || 0} samples)`)
+        .addTo(pathLayer);
+    }
+  }, [ready]);
 
   useEffect(() => {
     // Map setup
@@ -324,8 +480,8 @@ export default function ShadeClassifier({
       const div = L.DomUtil.create("div", "legend");
       div.innerHTML = `
         <div style="padding:8px;background:#0008;color:#fff;border-radius:8px;font:14px system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
-          <div><span style="color:#1a7f37">■■</span> mostly shaded</div>
-          <div><span style="color:#c62828">■■</span> mostly sunny</div>
+          <div><span style="color:#1a7f37">■■</span> shaded (cool)</div>
+          <div><span style="color:#c62828">■■</span> sunny (hot)</div>
         </div>`;
       return div;
     };
@@ -334,11 +490,19 @@ export default function ShadeClassifier({
     // Create shade layer
     map.whenReady(() => {
       setTimeout(() => {
-        createShadeLayer(map, lastDateRef.current);
+        const shadeDate = new Date();
+        shadeDate.setHours(currentHour, 0, 0, 0);
+        lastDateRef.current = shadeDate;
+        createShadeLayer(map, shadeDate);
       }, 100);
     });
 
     return () => {
+      // Clean up debounce timeout
+      if (penaltyUpdateTimeoutRef.current) {
+        clearTimeout(penaltyUpdateTimeoutRef.current);
+      }
+      
       map.off('click', handleMapClick);
       if (edgeLayerRef.current) {
         try {
@@ -365,15 +529,54 @@ export default function ShadeClassifier({
     };
   }, [handleMapClick]);
 
-  // Update date
+  // Update date (but preserve currentHour setting)
   useEffect(() => {
-    lastDateRef.current = date;
     if (shadeRef.current?.setDate) {
       setReady(false);
-      shadeRef.current.setDate(date);
+      const newDate = new Date(date);
+      newDate.setHours(currentHour, 0, 0, 0);
+      lastDateRef.current = newDate;
+      shadeRef.current.setDate(newDate);
       shadeRef.current.once("idle", () => setReady(true));
     }
   }, [date]);
+
+  // Update shade time when hour changes
+  useEffect(() => {
+    if (shadeRef.current?.setDate) {
+      setReady(false);
+      const newDate = new Date(lastDateRef.current);
+      newDate.setHours(currentHour, 0, 0, 0);
+      lastDateRef.current = newDate;
+      shadeRef.current.setDate(newDate);
+      shadeRef.current.once("idle", () => setReady(true));
+    }
+  }, [currentHour]);
+
+  // Reactive recomputation when shade settings change
+  useEffect(() => {
+    if (pathStateRef.current.startPoint && pathStateRef.current.endPoint) {
+      // Debounce the recomputation to avoid rapid API calls
+      if (penaltyUpdateTimeoutRef.current) {
+        clearTimeout(penaltyUpdateTimeoutRef.current);
+      }
+      
+      // Check if shade routing mode or time changed (needs longer delay for shadow recomputation)
+      const shadeRoutingChanged = prevShadeRoutingRef.current !== useShadeRouting;
+      const timeChanged = prevCurrentHourRef.current !== currentHour;
+      
+      prevShadeRoutingRef.current = useShadeRouting;
+      prevCurrentHourRef.current = currentHour;
+      
+      // Longer delay when shade routing toggles or time changes to allow shadow recomputation,
+      // shorter delay for penalty adjustments
+      const delay = (shadeRoutingChanged || timeChanged) ? 800 : 150;
+      
+      penaltyUpdateTimeoutRef.current = window.setTimeout(() => {
+        computeAndDisplayPath();
+      }, delay);
+    }
+  }, [useShadeRouting, shadePenalty, currentHour, computeAndDisplayPath]);
 
   // Classify edges by sampling the ShadeMap canvas
   async function classify({
@@ -475,181 +678,224 @@ export default function ShadeClassifier({
     }
   }
 
-  // Convert path to edges for shadow analysis
-  const pathToEdges = useCallback((): Edge[] => {
-    if (pathStateRef.current.path.length < 2) return [];
-
-    return pathStateRef.current.path.slice(0, -1).map((point, i) => ({
-      id: `path-${i}`,
-      a: { lat: point[0], lng: point[1] },
-      b: { lat: pathStateRef.current.path[i + 1][0], lng: pathStateRef.current.path[i + 1][1] }
-    }));
-  }, []);
-
-  const analyzePathShade = useCallback(async () => {
-    const pathEdges = pathToEdges();
-    if (pathEdges.length === 0 || !ready || !shadeRef.current) return;
-
-    // Analyze each path segment individually using the same logic as classify()
-    const map = mapRef.current!;
-    const shade = shadeRef.current!;
-    const rect = map.getContainer().getBoundingClientRect();
-    const pathResults: EdgeResult[] = [];
-
-    for (const edge of pathEdges) {
-      const lenM = L.latLng(edge.a).distanceTo(L.latLng(edge.b));
-      const steps = Math.min(Math.max(1, Math.ceil(lenM / 10)), 20); // 10m steps for path
-      let hits = 0, total = 0;
-
-      for (let j = 0; j <= steps; j++) {
-        const t = steps === 0 ? 0.5 : j / steps;
-        const base = lerp(edge.a, edge.b, t);
-
-        for (let s = 0; s < 3; s++) {
-          const p = jitterMeters(base, 1.5);
-          const cp = map.latLngToContainerPoint([p.lat, p.lng]);
-
-          if (cp.x < 0 || cp.y < 0 || cp.x >= rect.width || cp.y >= rect.height) {
-            continue;
-          }
-
-          const xWin = rect.left + cp.x;
-          const yWin = window.innerHeight - (rect.top + cp.y);
-
-          try {
-            const rgba: Uint8ClampedArray = shade.readPixel(xWin, yWin);
-            if (rgba && isShadowRGBA(rgba, 16)) hits++;
-            total++;
-          } catch (e) {
-            console.warn('Error reading pixel for path analysis:', e);
-          }
-        }
-      }
-
-      const shadePct = total ? hits / total : 0;
-      pathResults.push({
-        id: edge.id,
-        shadePct,
-        shaded: shadePct >= 0.5,
-        nSamples: total
-      });
-    }
-
-    // Clear and redraw path with shade colors
-    const pathLayer = pathLayerRef.current!;
-    // Keep markers but remove old path
-    const markers: L.Marker[] = [];
-    pathLayer.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        markers.push(layer);
-      }
-    });
-    pathLayer.clearLayers();
-    markers.forEach(marker => pathLayer.addLayer(marker));
-
-    // Draw path segments with shade colors
-    for (let i = 0; i < pathEdges.length; i++) {
-      const edge = pathEdges[i];
-      const result = pathResults.find(r => r.id === edge.id);
-      const pct = result?.shadePct ?? 0;
-
-      L.polyline(
-        [[edge.a.lat, edge.a.lng], [edge.b.lat, edge.b.lng]],
-        { color: colorForPct(pct), weight: 6, opacity: 0.8 }
-      )
-        .bindTooltip(`Path segment ${i + 1}: ${(pct * 100).toFixed(0)}% shaded (${result?.nSamples || 0} samples)`)
-        .addTo(pathLayer);
-    }
-  }, [pathToEdges, ready]);
-
   return (
     <div style={{ height: "100%", position: "relative" }}>
       <div id="map" style={{ height: "100%" }} />
 
-      {/* Shadow controls */}
+      {/* Settings Panel - Top Right */}
       <div style={{
-        position: "absolute", left: 12, top: 12, zIndex: 1000,
-        background: "rgba(0,0,0,0.6)", color: "#fff", padding: 8, borderRadius: 8,
-        font: "14px system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+        position: "absolute", right: 12, top: 12, zIndex: 1000,
+        background: "rgba(255,255,255,0.92)", color: "#333", padding: 12, borderRadius: 8,
+        font: "14px system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+        minWidth: 200,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
       }}>
-        {ready ? "Shadows ready" : "Rendering shadows…"}
-        <div style={{ marginTop: 6, display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ marginBottom: 4, fontSize: 12 }}>Time: {`${currentHour.toString().padStart(2, '0')}:00`}</div>
           <input
-            type="range" min={0} max={1440} step={5} defaultValue={540}
-            onChange={async (e) => {
-              const mins = parseInt((e.target as HTMLInputElement).value, 10);
-              const d = new Date();
-              d.setHours(0, 0, 0, 0);
-              d.setMinutes(mins);
-
-              lastDateRef.current = d;
-              if (shadeRef.current?.setDate) {
-                setReady(false);
-                shadeRef.current.setDate(d);
-                await new Promise<void>((res) => shadeRef.current.once("idle", () => {
-                  setReady(true);
-                  res();
-                }));
-                await classifyAndDraw();
-              }
+            type="range" min={0} max={23} step={1} value={currentHour}
+            onChange={(e) => {
+              const hours = parseInt((e.target as HTMLInputElement).value, 10);
+              setCurrentHour(hours);
             }}
+            style={{ width: '100%' }}
           />
-          <button onClick={classifyAndDraw} disabled={!ready}>
-            {ready ? "Classify edges" : "Wait..."}
-          </button>
+        </div>
+        
+        {/* Pathfinding controls */}
+        <div style={{ borderTop: '1px solid #ddd', paddingTop: 8 }}>
+          <div style={{ marginBottom: 6 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 12 }}>
+              <input
+                type="checkbox"
+                checked={useShadeRouting}
+                onChange={(e) => {
+                  setUseShadeRouting(e.target.checked);
+                }}
+              />
+              Shade-aware routing
+            </label>
+          </div>
+          
+          {useShadeRouting && (
+            <div style={{ fontSize: 12 }}>
+              <div style={{ marginBottom: 4 }}>Shade penalty: {shadePenalty.toFixed(1)}x</div>
+              <input
+                type="range"
+                min={0.5}
+                max={3.0}
+                step={0.1}
+                value={shadePenalty}
+                onChange={(e) => {
+                  const newPenalty = parseFloat(e.target.value);
+                  setShadePenalty(newPenalty);
+                }}
+                style={{ width: '100%' }}
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Pathfinding status overlay */}
+      {/* Compact Info Panel - Top Center (Hover to Expand) */}
       <div style={{
         position: 'absolute',
-        top: 10,
-        right: 10,
-        background: 'rgba(255,255,255,0.9)',
-        padding: '10px',
-        borderRadius: '5px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+        top: 20,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: 'rgba(255,255,255,0.92)',
+        padding: '12px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         zIndex: 1000,
-        maxWidth: '300px',
-        font: "14px system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+        font: "14px system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+        transition: 'all 0.3s ease',
+        cursor: pathUIState.path.length > 0 ? 'pointer' : 'default'
+      }}
+      className="info-panel"
+      onMouseEnter={(e) => {
+        if (pathUIState.path.length > 0) {
+          e.currentTarget.style.maxWidth = '350px';
+          e.currentTarget.style.padding = '16px';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (pathUIState.path.length > 0) {
+          e.currentTarget.style.maxWidth = '200px';
+          e.currentTarget.style.padding = '12px';
+        }
       }}>
-        {!pathUIState.startPoint && (
-          <div>Click on map to set start point</div>
+        {!ready && (
+          <div style={{ textAlign: 'center', color: '#007cba' }}>⏳ Loading shadows...</div>
         )}
-        {pathUIState.startPoint && !pathUIState.endPoint && (
-          <div>Click on map to set end point</div>
+        {ready && !pathUIState.startPoint && (
+          <div style={{ textAlign: 'center', color: '#666' }}>🗺️ Click to set start</div>
+        )}
+        {ready && pathUIState.startPoint && !pathUIState.endPoint && (
+          <div style={{ textAlign: 'center', color: '#666' }}>📍 Click to set destination</div>
         )}
         {pathUIState.loading && (
-          <div>Computing path...</div>
+          <div style={{ textAlign: 'center', color: '#007cba' }}>⏳ Computing path...</div>
         )}
         {pathUIState.error && (
-          <div style={{ color: 'red' }}>Error: {pathUIState.error}</div>
+          <div style={{ color: 'red', textAlign: 'center' }}>❌ {pathUIState.error}</div>
         )}
-        {pathUIState.path.length > 0 && (
+        {pathUIState.path.length > 0 && ready && (
           <div>
-            Path found! Click anywhere to start over.
-            <br />
-            Segments: {pathUIState.path.length - 1}
-            <br />
-            <button
-              onClick={analyzePathShade}
-              disabled={!ready}
-              style={{
-                marginTop: 5,
-                padding: '4px 8px',
-                fontSize: '12px',
-                backgroundColor: ready ? '#007cba' : '#ccc',
-                color: 'white',
-                border: 'none',
-                borderRadius: '3px',
-                cursor: ready ? 'pointer' : 'not-allowed'
-              }}
-            >
-              Analyze Path Shade
-            </button>
+            <div style={{ fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>
+              ✅ Path Found
+            </div>
+            
+            {/* Compact view */}
+            <div className="compact-info">
+              <div style={{ fontSize: 12, color: '#666', textAlign: 'center' }}>
+                {pathUIState.routeStats ? 
+                  `${pathUIState.routeStats.shadeAwareDistance.toFixed(0)}m • ${currentHour.toString().padStart(2, '0')}:00` :
+                  `${pathUIState.path.length - 1} segments`
+                }
+              </div>
+            </div>
+
+            {/* Expanded view (shown on hover) */}
+            <div className="expanded-info" style={{ 
+              display: 'none',
+              marginTop: 8,
+              fontSize: 12,
+              lineHeight: 1.4 
+            }}>
+              {pathUIState.routeStats ? (
+                <>
+                  <div>🎯 Distance: {pathUIState.routeStats.shadeAwareDistance.toFixed(0)}m</div>
+                  
+                  {pathUIState.routeStats.shadeMode === 'daylight' ? (
+                    <>
+                      <div>🌳 Shaded: {pathUIState.routeStats.totalShadeLength.toFixed(0)}m</div>
+                      <div>☀️ Unshaded: {(pathUIState.routeStats.shadeAwareDistance - pathUIState.routeStats.totalShadeLength).toFixed(0)}m</div>
+                      <div>📍 Shortest Path: {pathUIState.routeStats.originalDistance.toFixed(0)}m</div>
+                      <div>⏱️ Time: {pathUIState.routeStats.analysisTime} ({pathUIState.routeStats.shadeMode})</div>
+                      <div>⚖️ Penalty: +{pathUIState.routeStats.shadePenaltyAdded.toFixed(0)}m ({pathUIState.routeStats.shadePenalty}x)</div>
+                    </>
+                  ) : pathUIState.routeStats.shadeMode === 'standard' ? (
+                    <>
+                      <div>🌳 Shaded: {pathUIState.routeStats.totalShadeLength ? pathUIState.routeStats.totalShadeLength.toFixed(0) : '0'}m</div>
+                      <div>☀️ Unshaded: {pathUIState.routeStats.totalShadeLength ? (pathUIState.routeStats.shadeAwareDistance - pathUIState.routeStats.totalShadeLength).toFixed(0) : pathUIState.routeStats.shadeAwareDistance.toFixed(0)}m</div>
+                      <div>⏱️ Time: {currentHour.toString().padStart(2, '0')}:00 (standard)</div>
+                    </>
+                  ) : (
+                    <>
+                      <div>📍 Shortest Path: {pathUIState.routeStats.originalDistance.toFixed(0)}m</div>
+                      <div>⏱️ Time: {pathUIState.routeStats.analysisTime} ({pathUIState.routeStats.shadeMode})</div>
+                      <div>🌙 Night mode - no shade penalties</div>
+                    </>
+                  )}
+                  <div style={{ marginTop: 8, fontSize: 11, color: '#999', textAlign: 'center' }}>
+                    Click anywhere to start over
+                  </div>
+                </>
+              ) : (
+                <div>Segments: {pathUIState.path.length - 1}</div>
+              )}
+            </div>
           </div>
         )}
       </div>
+
+      {/* Legend - Bottom Left */}
+      <div style={{
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        background: 'rgba(255,255,255,0.92)',
+        padding: '12px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        zIndex: 1000,
+        font: "12px system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+      }}>
+        <div style={{ fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>
+          Route Shade Legend
+        </div>
+        
+        {/* Gradient bar */}
+        <div style={{
+          height: 20,
+          width: 200,
+          background: 'linear-gradient(to right, #c62828 0%, #ff8f00 25%, #ffc107 50%, #8bc34a 75%, #1a7f37 100%)',
+          borderRadius: 4,
+          border: '1px solid #ddd',
+          marginBottom: 6
+        }} />
+        
+        {/* Labels */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          width: 200,
+          fontSize: 10,
+          color: '#666'
+        }}>
+          <span>☀️ Unshaded (Hot)</span>
+          <span>🌳 Shaded (Cool)</span>
+        </div>
+        
+        <div style={{ 
+          marginTop: 6, 
+          fontSize: 10, 
+          color: '#999', 
+          textAlign: 'center' 
+        }}>
+          Paths colored by shade coverage
+        </div>
+      </div>
+
+      <style>{`
+        .info-panel:hover .compact-info {
+          display: none !important;
+        }
+        .info-panel:hover .expanded-info {
+          display: block !important;
+        }
+      `}</style>
     </div>
   );
 }
