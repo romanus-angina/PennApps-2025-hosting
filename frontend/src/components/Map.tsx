@@ -82,40 +82,29 @@ function isPointInTreeShadowLayer(treeShadowLayer: L.LayerGroup, latlng: [number
       return false;
     }
     
-    // Count layers for debugging
+    const latLng = L.latLng(latlng[0], latlng[1]);
     let polygonCount = 0;
-    let totalLayerCount = 0;
-    
-    // Check if point is inside any tree shadow polygon
     let isInside = false;
+    
+    // Performance optimization: check bounds first, then detailed polygon test
     treeShadowLayer.eachLayer((layer: any) => {
-      totalLayerCount++;
       if (layer instanceof L.Polygon) {
         polygonCount++;
-        // Use Leaflet's built-in point-in-polygon check
-        const latLng = L.latLng(latlng[0], latlng[1]);
-        const polygonPoints = layer.getLatLngs()[0] as L.LatLng[];
         const bounds = layer.getBounds();
         
-        // Enhanced debugging for first few polygons
-        if (polygonCount <= 3) {
-          const pointInBounds = bounds.contains(latLng);
-          console.log(`🔍 Polygon ${polygonCount}: bounds [${bounds.getSouth().toFixed(6)}, ${bounds.getWest().toFixed(6)}] to [${bounds.getNorth().toFixed(6)}, ${bounds.getEast().toFixed(6)}] - Point in bounds: ${pointInBounds}`);
-        }
-        
-        if (isPointInPolygon(latLng, polygonPoints)) {
-          console.log(`🎯 HIT! Point [${latlng[0].toFixed(6)}, ${latlng[1].toFixed(6)}] is inside tree shadow polygon ${polygonCount}`);
-          console.log(`🎯 Polygon bounds: [${bounds.getSouth().toFixed(6)}, ${bounds.getWest().toFixed(6)}] to [${bounds.getNorth().toFixed(6)}, ${bounds.getEast().toFixed(6)}]`);
-          isInside = true;
-          return false; // Break out of eachLayer
+        // Quick bounds check first (much faster than point-in-polygon)
+        if (bounds.contains(latLng)) {
+          const polygonPoints = layer.getLatLngs()[0] as L.LatLng[];
+          
+          // Only do expensive point-in-polygon test if point is in bounds
+          if (isPointInPolygon(latLng, polygonPoints)) {
+            console.log(`🎯 HIT! Point [${latlng[0].toFixed(6)}, ${latlng[1].toFixed(6)}] is inside tree shadow polygon ${polygonCount}`);
+            isInside = true;
+            return false; // Break out of eachLayer
+          }
         }
       }
     });
-    
-    // Debug info (log occasionally)
-    if (Math.random() < 0.001) {
-      console.log(`🔍 Tree shadow layer has ${totalLayerCount} total layers, ${polygonCount} polygons`);
-    }
     
     return isInside;
   } catch (error) {
@@ -590,7 +579,8 @@ export default function Map({
 
     for (const edge of pathEdges) {
       const lenM = L.latLng(edge.a).distanceTo(L.latLng(edge.b));
-      const steps = Math.min(Math.max(1, Math.ceil(lenM / 10)), 20);
+      // Adaptive sampling: more samples for longer segments, minimum 5 samples
+      const steps = Math.min(Math.max(5, Math.ceil(lenM / 5)), 30); // Increased density
       let hits = 0, total = 0;
 
       for (let j = 0; j <= steps; j++) {
@@ -602,8 +592,8 @@ export default function Map({
           console.log(`🎯 Base point ${total}: [${base.lat.toFixed(6)}, ${base.lng.toFixed(6)}] (before jitter)`);
         }
 
-        for (let s = 0; s < 3; s++) {
-          const p = jitterMeters(base, 0.1); // Reduced jitter from 1.5m to 0.1m for testing
+        for (let s = 0; s < 5; s++) { // Increased samples per point
+          const p = jitterMeters(base, 0.5); // Increased jitter for better coverage
           const cp = map.latLngToContainerPoint([p.lat, p.lng]);
 
           if (cp.x < 0 || cp.y < 0 || cp.x >= rect.width || cp.y >= rect.height) {
@@ -611,35 +601,43 @@ export default function Map({
           }
 
           try {
-            // Check for shade - either building shadows (pixel) or tree shadows (DOM)
+            // Check for shade - COMBINED: both building shadows (pixel) AND tree shadows (geometric)
             let isShaded = false;
+            let buildingShade = false;
+            let treeShade = false;
             
-            if (shade && !showTreeShadowsRef.current) {
-              // Use building shadow layer if available and tree shadows are disabled
-              if (total === 0) {
-                console.log("🏢 Using building shadow pixel sampling (tree shadows disabled)");
-              }
+            // Check building shadows (pixel sampling) - if available
+            if (shade) {
               const xWin = rect.left + cp.x;
               const yWin = window.innerHeight - (rect.top + cp.y);
               const rgba = shade.readPixel(xWin, yWin);
-              isShaded = rgba && isShadowRGBA(rgba, 16);
-            } else {
-              // Check if point is under a tree shadow polygon (geometric)
-              const currentTreeShadowLayer = treeShadowLayerRef.current; // Get current reference
-              if (currentTreeShadowLayer) {
-                // Debug: Log when we're using geometric detection
-                if (total === 0) {
-                  console.log("🌳 Using geometric tree shadow detection (tree shadows enabled)");
-                }
-                isShaded = isPointInTreeShadowLayer(currentTreeShadowLayer, [p.lat, p.lng]);
-                // Enhanced debugging - log ALL samples for first few segments
-                if (total < 20) { // Debug first 20 samples
-                  console.log(`🔍 Sample ${total}: [${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}] (jittered from [${base.lat.toFixed(6)}, ${base.lng.toFixed(6)}]) -> ${isShaded ? '✅ SHADED' : '❌ not shaded'}`);
-                }
-              } else {
-                console.warn('🚨 Tree shadow layer not available for point checking');
-                isShaded = false;
-              }
+              buildingShade = rgba && isShadowRGBA(rgba, 16);
+            }
+            
+            // Check tree shadows (geometric) - if available
+            const currentTreeShadowLayer = treeShadowLayerRef.current;
+            if (currentTreeShadowLayer) {
+              treeShade = isPointInTreeShadowLayer(currentTreeShadowLayer, [p.lat, p.lng]);
+            }
+            
+            // Combined result: either shadow type counts as shaded
+            isShaded = buildingShade || treeShade;
+            
+            // Debug logging for first few samples
+            if (total < 20) {
+              const shadowTypes = [];
+              if (buildingShade) shadowTypes.push('🏢 building');
+              if (treeShade) shadowTypes.push('🌳 tree');
+              const shadowInfo = shadowTypes.length > 0 ? shadowTypes.join(' + ') : 'none';
+              
+              console.log(`🔍 Sample ${total}: [${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}] -> ${isShaded ? '✅ SHADED' : '❌ not shaded'} (${shadowInfo})`);
+            }
+            
+            // Log detection mode on first sample
+            if (total === 0) {
+              console.log("🌞 Using COMBINED shadow detection:");
+              console.log(`   🏢 Building shadows: ${shade ? 'available' : 'not available'}`);
+              console.log(`   🌳 Tree shadows: ${currentTreeShadowLayer ? 'available' : 'not available'}`);
             }
             
             if (isShaded) hits++;
@@ -654,7 +652,8 @@ export default function Map({
       
       // Debug logging for segments with potential shade
       if (total > 0) {
-        console.log(`📊 Segment ${edge.id}: ${hits}/${total} hits = ${(shadePct * 100).toFixed(1)}% shade`);
+        const color = colorForPct(shadePct);
+        console.log(`📊 Segment ${edge.id}: ${hits}/${total} hits = ${(shadePct * 100).toFixed(1)}% shade (color: ${color})`);
       }
       
       pathResults.push({
@@ -1160,8 +1159,9 @@ export default function Map({
                   setShowTreeShadows(e.target.checked);
                   showTreeShadowsRef.current = e.target.checked; // Update ref immediately
                 }}
+                title="Toggle tree shadow visibility on map (detection always active)"
               />
-              Tree Shadows
+              Show Tree Shadows
             </label>
           </div>
           
@@ -1234,7 +1234,7 @@ export default function Map({
           <div style={{ textAlign: 'center', color: '#666' }}>
             🗺️ Click to set start<br/>
             <small style={{ fontSize: '10px', color: '#999' }}>
-              Toggle "Tree Shadows" ON to test geometric detection
+              Both building + tree shadows detected automatically
             </small>
           </div>
         )}
