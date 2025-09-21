@@ -85,12 +85,14 @@ export default function Map({
   const shadeRef = useRef<any>(null);
   const edgeLayerRef = useRef<L.LayerGroup | null>(null);
   const pathLayerRef = useRef<L.LayerGroup | null>(null);
+  const treeShadowLayerRef = useRef<L.LayerGroup | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const [testToggle, setTestToggle] = useState(false);
   const [ready, setReady] = useState(false);
   const [currentHour, setCurrentHour] = useState(9);
   const [shadePenalty, setShadePenalty] = useState(1.0); // Shade avoidance factor
   const [useShadeRouting, setUseShadeRouting] = useState(true); // Toggle for shade-aware routing
+  const [showTreeShadows, setShowTreeShadows] = useState(false); // Toggle for tree shadows
   const fetchTokenRef = useRef(0);
 
   // Use refs instead of state to avoid re-renders for pathfinding
@@ -262,6 +264,89 @@ export default function Map({
       }
     }
   };
+
+  // Load tree shadows from backend API
+  const loadTreeShadows = useCallback(async () => {
+    if (!treeShadowLayerRef.current) return;
+
+    try {
+      console.log("🌳 Loading tree shadows from backend...");
+      const response = await fetch('http://localhost:8000/tree_shadows');
+      const data = await response.json();
+
+      if (data.error) {
+        console.error("❌ Error loading tree shadows:", data.error);
+        return;
+      }
+
+      const treeShadowLayer = treeShadowLayerRef.current;
+      treeShadowLayer.clearLayers();
+
+      if (data.features && Array.isArray(data.features)) {
+        console.log(`🌳 Rendering ${data.features.length} tree shadow polygons`);
+
+        data.features.forEach((feature: any) => {
+          try {
+            const { geometry, properties } = feature;
+            
+            if (geometry.type === 'Polygon' && geometry.coordinates && geometry.coordinates[0]) {
+              // Convert GeoJSON coordinates [lng, lat] to Leaflet format [lat, lng]
+              const leafletCoords = geometry.coordinates[0].map((coord: [number, number]) => [coord[1], coord[0]]);
+              
+              // Create polygon with tree shadow styling
+              const polygon = L.polygon(leafletCoords, {
+                fillColor: '#01112f',
+                color: '#01112f',
+                fillOpacity: 0.5,
+                opacity: 0.7,
+                weight: 1
+              });
+
+              // Add hover tooltip with tree information
+              const tooltipContent = `
+                <div style="font-size: 12px; line-height: 1.4;">
+                  <strong>Tree Shadow</strong><br/>
+                  ID: ${properties.tree_id || properties.id || 'Unknown'}<br/>
+                  Density: ${properties.density ? properties.density.toFixed(2) : 'Unknown'}<br/>
+                  Radius: ${properties.shadow_radius_m || 'Unknown'}m
+                </div>
+              `;
+              
+              polygon.bindTooltip(tooltipContent, {
+                sticky: true,
+                direction: 'top'
+              });
+
+              // Add debug logging on hover
+              polygon.on('mouseover', () => {
+                console.log(`🌳 Hovered tree shadow:`, properties);
+              });
+
+              polygon.addTo(treeShadowLayer);
+            }
+          } catch (error) {
+            console.warn("Error rendering tree shadow feature:", error, feature);
+          }
+        });
+
+        console.log(`✅ Successfully rendered ${data.features.length} tree shadow polygons`);
+      } else {
+        console.warn("No tree shadow features found in response");
+      }
+    } catch (error) {
+      console.error("❌ Failed to load tree shadows:", error);
+    }
+  }, []);
+
+  // Effect to load/hide tree shadows when toggle changes
+  useEffect(() => {
+    if (showTreeShadows) {
+      loadTreeShadows();
+    } else if (treeShadowLayerRef.current) {
+      treeShadowLayerRef.current.clearLayers();
+      console.log("🌳 Tree shadows hidden");
+    }
+  }, [showTreeShadows, loadTreeShadows]);
 
   // Function to display path with gradient shade analysis
   const displayPathWithShadeAnalysis = useCallback(async (pathCoords: [number, number][]) => {
@@ -544,6 +629,9 @@ export default function Map({
     // Create path layer for pathfinding
     pathLayerRef.current = L.layerGroup().addTo(map);
 
+    // Create tree shadow layer for tree shadows
+    treeShadowLayerRef.current = L.layerGroup().addTo(map);
+
     // Add click handler for placing markers (now supports pathfinding)
     map.on('click', handleMapClick);
 
@@ -574,6 +662,13 @@ export default function Map({
           map.removeLayer(pathLayerRef.current);
         } catch (e) {
           console.warn('Error removing path layer:', e);
+        }
+      }
+      if (treeShadowLayerRef.current) {
+        try {
+          map.removeLayer(treeShadowLayerRef.current);
+        } catch (e) {
+          console.warn('Error removing tree shadow layer:', e);
         }
       }
       
@@ -751,11 +846,25 @@ export default function Map({
               setCurrentHour(hours);
             }}
             style={{ width: '100%' }}
+            title={`Time slider: ${currentHour.toString().padStart(2, '0')}:00`}
           />
         </div>
         
-        {/* Pathfinding controls */}
+        {/* Shadow controls */}
         <div style={{ borderTop: '1px solid #ddd', paddingTop: 8 }}>
+          <div style={{ marginBottom: 6 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 12 }}>
+              <input
+                type="checkbox"
+                checked={showTreeShadows}
+                onChange={(e) => {
+                  setShowTreeShadows(e.target.checked);
+                }}
+              />
+              Tree Shadows
+            </label>
+          </div>
+          
           <div style={{ marginBottom: 6 }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 12 }}>
               <input
@@ -783,6 +892,7 @@ export default function Map({
                   setShadePenalty(newPenalty);
                 }}
                 style={{ width: '100%' }}
+                title={`Shade penalty slider: ${shadePenalty.toFixed(1)}x`}
               />
             </div>
           )}

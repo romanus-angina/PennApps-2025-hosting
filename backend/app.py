@@ -8,17 +8,22 @@ import os
 from pyproj import Geod
 import pickle
 from contextlib import asynccontextmanager
+from tree_shadows import precompute_tree_shadows, get_tree_shadow_generator
 
 # Global graph variable
 G: Optional[nx.Graph] = None
 geod = Geod(ellps="WGS84")
 
+# Global tree shadows variable
+tree_shadows_geojson: Optional[Dict[str, Any]] = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Load the segmented graph on startup."""
-    global G
-    # Try to load enhanced graph first, fallback to original
+    """Load the segmented graph and precompute tree shadows on startup."""
+    global G, tree_shadows_geojson
+    
+    # Load graph data
     enhanced_graph_path = os.path.join(os.path.dirname(__file__), "data", "graph_segments_with_shade.gpickle")
     original_graph_path = os.path.join(os.path.dirname(__file__), "data", "graph_segments.gpickle")
     
@@ -41,6 +46,18 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"Failed to load graph: {e}")
         G = None
+    
+    # Precompute tree shadows
+    tree_data_path = os.path.join(os.path.dirname(__file__), "tree_positions.json")
+    try:
+        print("🌳 Precomputing tree shadows...")
+        tree_shadows_geojson = precompute_tree_shadows(tree_data_path)
+        feature_count = len(tree_shadows_geojson.get('features', []))
+        print(f"✅ Tree shadows precomputed: {feature_count} shadow polygons generated")
+    except Exception as e:
+        print(f"❌ Failed to precompute tree shadows: {e}")
+        tree_shadows_geojson = None
+    
     yield
 
 
@@ -495,3 +512,54 @@ async def download_graph_edges(limit: Optional[int] = None):
             content={"error": f"Failed to export edges: {str(e)}"}, 
             status_code=500
         )
+
+
+@app.get("/tree_shadows")
+async def get_tree_shadows() -> Dict[str, Any]:
+    """
+    Get precomputed tree shadow polygons as GeoJSON FeatureCollection.
+    
+    Returns:
+        GeoJSON FeatureCollection with circular shadow polygons for trees with density >= 0.2
+        Shadow radius is mapped linearly from density [0.2, 1.0] to radius [1m, 5m]
+    """
+    global tree_shadows_geojson
+    
+    if tree_shadows_geojson is None:
+        return {"error": "Tree shadows not available - failed to precompute on startup"}
+    
+    try:
+        # Add runtime metadata
+        response = tree_shadows_geojson.copy()
+        response["properties"]["served_at"] = "runtime"
+        
+        # Log request for debugging
+        feature_count = len(response.get('features', []))
+        print(f"🌳 Serving {feature_count} tree shadow polygons")
+        
+        return response
+        
+    except Exception as e:
+        print(f"❌ Error serving tree shadows: {e}")
+        return {"error": f"Failed to serve tree shadows: {str(e)}"}
+
+
+@app.get("/tree_shadows/stats")
+async def get_tree_shadow_stats() -> Dict[str, Any]:
+    """
+    Get statistics about the tree shadow generation process.
+    
+    Returns:
+        Statistics about tree filtering, density mapping, and polygon generation
+    """
+    try:
+        tree_data_path = os.path.join(os.path.dirname(__file__), "tree_positions.json")
+        generator = get_tree_shadow_generator(tree_data_path)
+        stats = generator.get_statistics()
+        
+        print("📊 Tree shadow statistics requested")
+        return stats
+        
+    except Exception as e:
+        print(f"❌ Error getting tree shadow stats: {e}")
+        return {"error": f"Failed to get tree shadow statistics: {str(e)}"}
