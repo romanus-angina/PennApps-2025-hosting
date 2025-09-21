@@ -9,7 +9,6 @@ import "leaflet-shadow-simulator";
 import osmtogeojson from "osmtogeojson";
 
 // import AddressSearch from "./AddressSearch"; // Not used in this component
-
 // ---------- Icons fix for Vite ----------
 const iconRetinaUrl = new URL("leaflet/dist/images/marker-icon-2x.png", import.meta.url).href;
 const iconUrl = new URL("leaflet/dist/images/marker-icon.png", import.meta.url).href;
@@ -242,6 +241,7 @@ export default function Map({
   const [showTreeShadows, setShowTreeShadows] = useState(false); // Toggle for tree shadows
   const showTreeShadowsRef = useRef(false); // Ref to track current state
   const fetchTokenRef = useRef(0);
+  const retryAttemptRef = useRef<string | null>(null); // Track current path being retried
 
   // Use refs instead of state to avoid re-renders for pathfinding
   const pathStateRef = useRef<PathState>({
@@ -393,16 +393,23 @@ export default function Map({
 
   // Helper to create the ShadeMap layer
   const createShadeLayer = (map: L.Map, when: Date) => {
-    console.log("Creating shade layer for time:", when);
+    console.log("🌤️ Creating shade layer for time:", when, "ready state:", ready);
     const layer = (L as any).shadeMap(buildShadeOptions(when));
 
     layer.once("idle", () => {
-      console.log("Shade layer ready");
+      console.log("✅ Shade layer is now READY! Setting ready=true");
       setReady(true);
+      
+      // If we have a pending path, try to display it now
+      if (pathStateRef.current.path.length > 0) {
+        console.log("🔄 Found pending path, attempting to display it now that shade layer is ready");
+        displayPathWithShadeAnalysis(pathStateRef.current.path);
+      }
     });
 
     layer.addTo(map);
     shadeRef.current = layer;
+    console.log("🌤️ Shade layer added to map, waiting for idle event...");
 
     // Prevent the shade layer from responding to map events
     if (layer._container || layer.getContainer?.()) {
@@ -412,6 +419,38 @@ export default function Map({
       }
     }
   };
+
+  // Fallback function to display simple path without shade analysis
+  const displaySimplePath = useCallback((pathCoords: [number, number][]) => {
+    console.log("🟦 Displaying simple path fallback with", pathCoords.length, "coordinates");
+    
+    if (!mapRef.current || !pathLayerRef.current) {
+      console.log("❌ Cannot display simple path - missing map or path layer");
+      return;
+    }
+
+    const pathLayer = pathLayerRef.current;
+    
+    // Preserve existing markers but clear any existing paths
+    const markers: L.Marker[] = [];
+    pathLayer.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        markers.push(layer);
+      }
+    });
+    pathLayer.clearLayers();
+    markers.forEach(marker => pathLayer.addLayer(marker));
+
+    // Draw simple blue path
+    const polyline = L.polyline(pathCoords, { 
+      color: '#007cba', 
+      weight: 4, 
+      opacity: 0.7 
+    }).addTo(pathLayer);
+    
+    polyline.bindTooltip(`Route: ${pathCoords.length} points (simple display - shade analysis pending)`);
+    console.log("✅ Simple path displayed successfully");
+  }, []);
 
   // Load tree shadows from backend API
   const loadTreeShadows = useCallback(async () => {
@@ -698,7 +737,7 @@ export default function Map({
         .bindTooltip(`Route: ${pathCoords.length} points`)
         .addTo(pathLayer);
     }
-  }, [ready, showTreeShadows, showTreeShadowsRef]);
+  }, [ready, showTreeShadows, showTreeShadowsRef, displaySimplePath]);
 
   // Unified function to compute and display path with backend API calls
   const computeAndDisplayPath = useCallback(async () => {
@@ -793,7 +832,11 @@ export default function Map({
       
       // Use unified pixel sampling for all shade analysis (building + tree shadows)
       if (pathCoords.length > 0) {
+        console.log("🚀 Calling displayPathWithShadeAnalysis with", pathCoords.length, "coordinates");
         await displayPathWithShadeAnalysis(pathCoords);
+        console.log("✅ displayPathWithShadeAnalysis completed");
+      } else {
+        console.log("⚠️ No path coordinates to display");
       }
 
     } catch (err) {
@@ -1000,18 +1043,25 @@ export default function Map({
 
   // Update shade time when hour changes
   useEffect(() => {
-    console.log("TestMap useEffect triggered - Hour changed:", currentHour);
+    console.log("⏰ Hour changed useEffect triggered:", currentHour, "ready:", ready);
     if (shadeRef.current?.setDate) {
+      console.log("⏰ Setting ready=false and updating shade time");
       setReady(false);
       const newDate = new Date();
       newDate.setHours(currentHour, 0, 0, 0);
       shadeRef.current.setDate(newDate);
       shadeRef.current.once("idle", () => {
-        console.log("Shade layer updated for hour:", currentHour);
+        console.log("✅ Shade layer updated for hour:", currentHour, "setting ready=true");
         setReady(true);
+        
+        // If we have a pending path, try to display it now
+        if (pathStateRef.current.path.length > 0) {
+          console.log("🔄 Found pending path after time change, attempting to display");
+          displayPathWithShadeAnalysis(pathStateRef.current.path);
+        }
       });
     }
-  }, [currentHour]);
+  }, [currentHour, displayPathWithShadeAnalysis]);
 
   // Separate useEffect for toggle changes to see if this causes refresh
   useEffect(() => {
@@ -1247,7 +1297,7 @@ export default function Map({
         {pathUIState.error && (
           <div style={{ color: 'red', textAlign: 'center' }}>❌ {pathUIState.error}</div>
         )}
-        {pathUIState.path.length > 0 && ready && (
+        {pathUIState.path.length > 0 && ready && !pathUIState.loading && (
           <div>
             <div style={{ fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>
               ✅ Path Found
